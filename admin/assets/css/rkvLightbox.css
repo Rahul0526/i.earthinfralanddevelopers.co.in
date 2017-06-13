@@ -1,0 +1,229 @@
+.createPoster {
+  display: inline-block;
+  float: left;
+  width: 100%;
+  text-align: center;
+  color: #32B659;
+  border: 2px solid #32B659;
+  padding: 7px;
+}
+
+.lightbox {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,0.5);
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-content: center;
+	top: 0;
+	left: 0;
+	z-index: 9999999;
+}
+
+.lightbox-container {
+	display: table;
+	width: 750px;
+	margin: auto;
+	padding: 10px 0;
+	background-color: #EEEEEE;
+	border: 1px solid #FFFFFF;
+	box-shadow: 0 0 50px #FFF inset;
+}
+
+.lightbox .closeAndReset {
+	position: absolute;
+	right: 20px;
+	top: 20px;
+	width: 30px;
+	height: 30px;
+	cursor: pointer;
+}
+.lightbox .closeAndReset:before,
+.lightbox .closeAndReset:after {
+	content: '';
+	position: absolute;
+	width: 100%;
+	height: 2px;
+	top: 50%;
+	background-color: #fff;
+}
+.lightbox .closeAndReset:before {
+	transform: translateY(-50%) rotate(45deg);
+}
+.lightbox .closeAndReset:after {
+	transform: translateY(-50%) rotate(-45deg);
+}
+
+.videobanner {
+	text-align: center;
+	position: relative;
+}
+
+.videobanner input {
+	position: absolute;
+	opacity: 0;
+	z-index: -99;
+}
+
+.videobanner input ~ label {
+	cursor: pointer;
+}
+.videobanner label {
+	display: table;
+	float: none;
+	margin: 10px auto;
+	width: 300px;
+	height: 168px;
+	background-color: #fff;
+	box-shadow: 0 0 0 1px #ccc;
+}
+
+.videobanner input:checked ~ label {
+	/*border: 5px solid #00A2E8;*/
+	box-shadow: 0 0 0 5px #00A2E8;
+}
+.videobanner label span {
+	display: flex;
+	float: left;
+	box-sizing: border-box;
+	border-color: #ccc;
+	border-style: solid;
+	border-width: 0;
+	flex-direction: column;
+	justify-content: center;
+	align-content: center;
+	text-align: center;
+	font-size: 10px;
+	font-weight: 100;
+}
+
+.videobanner .posterTitle {
+	display: block;
+	font-weight: bold;
+}
+
+.videobanner .bannerPart1.bordered {
+	border-right-width: 1px;
+}
+.videobanner .bannerPart1 {
+	width: 112px;
+	height: 168px;
+}
+.videobanner .bannerPart2 {
+	width: 188px;
+	height: 168px;
+}
+.videobanner .bannerPart3.bordered,
+.videobanner .bannerPart5.bordered {
+	border-bottom-width: 1px;
+}
+.videobanner .bannerPart3,
+.videobanner .bannerPart4,
+.videobanner .bannerPart5,
+.videobanner .bannerPart6 {
+	width: 100%;
+	height: 84px;
+}
+.lightbox .next-step {
+	margin-top: 20px;
+}
+
+.customizeBanner .bannerPart {
+	position: relative;
+	z-index: 5;
+}
+.customizeBanner .banner img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+.customizeBanner .bannerPart:before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #555;
+}
+
+.customizeBanner .bannerPart1:before {
+	left: -20px;
+	content: "A";
+}
+.customizeBanner .bannerPart3:before {
+	right: -20px;
+	content: "B";
+}
+.customizeBanner .bannerPart4:before {
+	right: -20px;
+	content: "C";
+}
+.customizeBanner .bannerPart5:before {
+	left: -20px;
+	content: "A";
+}
+.customizeBanner .bannerPart6:before {
+	left: -20px;
+	content: "B";
+}
+.customizeBanner ul {
+	display: inline-block;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+.customizeBanner ul li {
+	position: relative;
+	width: 100%;
+	display: inline-block;
+	margin-top: 15px;
+	line-height: 34px;
+	font-size: 14px;
+}
+.customizeBanner ul input {
+	position: absolute;
+	z-index: -999;
+}
+.customizeBanner ul .title {
+	font-weight: bold;
+	float: left;
+}
+.customizeBanner ul input + label {
+	display: inline-block;
+	float: left;
+	width: 24px;
+	height: 34px;
+	margin: 0 10px;
+	cursor: pointer;
+	background-image: url('../img/upload.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+.customizeBanner .banner {
+	position: relative;
+}
+
+.customizeBanner #bannerbackground1,
+.customizeBanner #bannerbackground2 {
+	position: absolute;
+	z-index: 0;
+	width: 300px;
+	height: 168px;
+	top: 0;
+	left: 0;
+}
+
+#checkImgSize {
+	position: fixed;
+	z-index: -99999;
+	opacity: 0;
+}
+.customizeBanner select {
+	float: left;
+	width: auto;
+	margin-left: 20px;
+}

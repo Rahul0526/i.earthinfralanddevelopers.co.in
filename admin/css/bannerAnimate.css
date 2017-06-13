@@ -1,0 +1,85 @@
+#videoBanner1, #videoBanner2 {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+#videoBanner1 #panel1 {
+  position: absolute;
+  width: 37.5%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+#videoBanner1 *,
+#videoBanner2 *{
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+#videoBanner1 .panel2 {
+  position: absolute;
+  width: 62.5%;
+  height: 100%;
+  top: 0;
+  right: 0;
+}
+#videoBanner1 .panel2 #panel2_1,
+#videoBanner1 .panel2 #panel2_2,
+#videoBanner2 #panel3,
+#videoBanner2 #panel4{
+  position: absolute;
+  width: 100%;
+  height: 50%;
+  left: 0;
+}
+#videoBanner1 .panel2 #panel2_1,
+#videoBanner2 #panel3 {
+  top: 0;
+}
+#videoBanner1 .panel2 #panel2_2,
+#videoBanner2 #panel4 {
+  bottom: 0;
+}
+
+#playButton {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9;    
+}
+#playVideo {
+    position: absolute;
+    overflow: hidden;
+    width: 23%;
+    border-radius: 100%;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+#playVideo:before {
+    content: "";
+    float: left;
+    width: 100%;
+    padding-top: 100%;
+}
+#playVideo.bigBottomLeft {
+    background-image: url('../img/bigplaybutton.png');
+    left: 7px;
+    bottom: 3px;
+}
+#playVideo.bigCenter {
+    background-image: url('../img/bigplaybutton.png');
+    left: 50%;
+    top: calc(50% + 4px);
+    transform: translateX(-50%) translateY(-50%);
+}
+#playVideo.smallBottomRight {
+    background-image: url('../img/smallplaybutton.png');
+    right: -2px;
+    bottom: -4px;
+}
