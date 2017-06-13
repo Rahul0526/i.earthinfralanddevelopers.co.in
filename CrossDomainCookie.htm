@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script language="javascript" src="http://camp.earthinfralanddevelopers.co.in/admin/js/jquery-1.11.3.min.js"
+        type="text/javascript"></script>
+    <script src="admin/js/QueryData.js" type="text/javascript"></script>
+    <script type="text/javascript">
+    window.onload = function CheckCookieName() {
+           
+            var Url = window.location;
+           // alert(Url);
+            var site_array = new Array();
+            var site_array = Url.toString().split('=');
+            var QueryData = site_array[1];
+            var dataArray = new Array();
+            dataArray = QueryData.toString().split(',');
+            var DomainName = dataArray[0];
+            var campId = dataArray[1];
+            var expiredays = dataArray[2];
+            var TagSepecification = dataArray[3];
+            var username = getCookie('UniqueIdentification');
+            if (username == '') {// means if UniqueId do not found
+               
+                var d = new Date();
+              
+                var UserId = makeid(); var Id = 'UniqueIdentification=' + UserId;
+                d.setTime(d.getTime() + (10000 * 24 * 60 * 60 * 1000));
+                expires = 'expires=' + d.toUTCString();
+                document.cookie = Id + ';' + expires; //adding unique id
+
+                var tagValue = DomainName.toString() + ',' + campId + ',' + expiredays + ',' + TagSepecification;
+                AddCookie(UserId, tagValue, expiredays); // adding details .
+            }
+            else {
+                var UniqueId = GetCookieValByName('UniqueIdentification');
+                var GetAdCookieDetails = GetCookieValByName(UniqueId);
+                var tagValue = DomainName.toString() + ',' + campId + ',' + expiredays + ',' + TagSepecification;
+                var ExpireDays = '3';
+                if (GetAdCookieDetails == undefined) {
+                    AddCookie(UniqueId, tagValue, expiredays);
+                }
+                else 
+                { 
+                }
+            }
+        }
+
+        function AddCookie(CookieName, CookieValue, ExpireIn) 
+        {
+            var d = new Date();
+            d.setTime(d.getTime() + (ExpireIn * 24 * 60 * 60 * 1000));
+            var expires = 'expires=' + d.toUTCString(); var CampId = 'sa0929112247116'; var TargetedCamp = 'TargetedCamp=' + CampId;
+            document.cookie = CookieName + '=' + CookieValue + '; ' + expires;
+        }
+
+        function getCookie(cname) {
+            var name = cname + '=';
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return '';
+        }
+
+        function makeid() {
+            var text = '';
+            var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            for (var i = 0; i < 5; i++)
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+            return text;
+        }
+
+        function GetCookieValByName(name)
+        {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    }
+
+    </script>
+</head>
+<body>
+    <p>
+        loaded</p>
+</body>
+</html>

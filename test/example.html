@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Document</title>
+    <style>
+		.container {
+			display: block;
+			width: 1170px;
+			margin: 0 auto;
+		}
+		@media (max-width: 1170px) {
+		  .container {
+		    width: 100%;
+		  }
+		}
+		.no-padding {
+		  padding: 0;
+		}
+		body {
+		  font-size: 3px;
+		  font-family: arial;
+		}
+		.player_holder {
+		  float: left;
+		  overflow: hidden;
+		  width: 100%;
+		  position: relative;
+		}
+		#videoPlayer {
+		  position: relative;
+		  z-index: 1;
+		  width: 100%;
+		  height: auto;
+		}
+		#playOverlay {
+		  position: absolute;
+		  z-index: 2;
+		  width: 100%;
+		  height: 75%;
+		  top: 0;
+		  left: 0;
+		}
+		#beforeOverlay {
+		  position: absolute;
+		  z-index: 4;
+		  width: 100%;
+		  height: 25%;
+		  bottom: 0;
+		  cursor: pointer;
+		  left: 0;
+		}
+		#afterOverlay {
+		  position: absolute;
+		  z-index: 5;
+		  width: 100%;
+		  height: 100%;
+		  bottom: 0;
+		  cursor: pointer;
+		  left: 0;
+		  display: none;
+		  overflow: hidden;
+		  background-position: center center;
+		  background-size: cover;
+		  background-repeat: no-repeat;
+		}
+		#afterOverlay img {
+		  float: left;
+		  width: 100%;
+		  min-height: 100%;
+		}
+		.visible {
+		  display: block !important;
+		}
+		.unvisible {
+		  display: none !important;
+		}
+		.fullSize {
+		  height: 100% !important;
+		}
+		#playBtn {
+		  position: absolute;
+		  top: 15px;
+		  right: 15px;
+		  width: 75px;
+		  height: 75px;
+		  font-size: 2em;
+		  color: #fff;
+		  z-index: 15;
+		  display: none;
+		  background: url('http://2.bp.blogspot.com/-POOLIXJmxW4/Vi9-7_KtYsI/AAAAAAAAFKU/GwwqrctWuLY/s1600/reload.png');
+		  background-size: 100% 100%;
+		  background-repeat: no-repeat;
+		  background-position: center center;
+		  font-weight: bold;
+		  cursor: pointer;
+		  -webkit-border-radius: 50%;
+		  -moz-border-radius: 50%;
+		  border-radius: 50%;
+		  -moz-background-clip: padding;
+		  -webkit-background-clip: padding-box;
+		  background-clip: padding-box;
+		  text-align: center;
+		  overflow: hidden;
+		}
+		@media (max-width: 992px) {
+		  #playBtn {
+		    width: 50px;
+		    height: 50px;
+		  }
+		}
+		@media (max-width: 540px) {
+		  #playBtn {
+		    width: 40px;
+		    height: 40px;
+		  }
+		}
+
+    </style>
+</head>
+
+<body>
+
+	<!-- content -->
+	<div id="main">
+		<div class="container">
+			<div class="row">
+				
+<div class="player_holder">
+					
+					<div id="playOverlay"></div>
+					<a href="//google.it" id="beforeOverlay"></a>
+
+
+					<video 
+						id="videoPlayer" 
+						poster="http://1.bp.blogspot.com/-VcJZPFVW4D4/Vi9xqAq8RjI/AAAAAAAAFJ4/OVHeZuYtjUU/s1600/img1.png"
+					>
+ 						<source 
+	 						src="http://fluximedia.com/wp-content/uploads/2015/10/Monopoly-Bingo.webm" 
+	               			type="video/webm;" 
+	               			codecs="vp8,vorbis">
+  						<source 
+	  						src="http://fluximedia.com/wp-content/uploads/2015/10/Monopoly-Bingo.mp4" 
+	              			type="video/mp4;" codecs="avc1.42E01E mp4a.40.2">
+					</video>
+
+					<a href="//google.it" id="afterOverlay" data-bg="http://3.bp.blogspot.com/-ef4B4RGnz8c/Vi9876PtUqI/AAAAAAAAFKI/e2CXhfC3W-s/s1600/post-image.png"></a>
+					<div id="playBtn"></div>
+
+	
+				</div>
+                
+              
+			</div>
+		</div>
+	</div>
+	<!-- .content -->
+	
+	<!-- scripts -->
+	<script>
+		var player = document.getElementById('videoPlayer'),
+	    	beforeOverlay = document.getElementById('beforeOverlay'),
+	    	playOverlay = document.getElementById('playOverlay'),
+	    	afterOverlay = document.getElementById('afterOverlay'),
+	    	playBtn = document.getElementById('playBtn')
+	    	bg = afterOverlay.dataset.bg;
+
+	    	
+	    afterOverlay.style.background = 'url('+bg+') no-repeat center center';
+	    afterOverlay.style.backgroundSize = 'contain'; 
+	    afterOverlay.style.backgroundRepeat = 'no-repeat';
+	    player.volume = 0.5;
+
+	    playOverlay.addEventListener('click',function(e){
+	    	beforeOverlay.className = "unvisible";
+	    	playOverlay.className = "fullSize";
+		    if (!player.paused) {
+		        player.pause();
+		    } else {
+		        player.play(); 		        
+		    }
+		});
+
+	    player.addEventListener('ended' , function() {
+	    	afterOverlay.className = "visible";
+	    	playBtn.className = "visible";
+		    playOverlay.classList.remove("fullSize");
+		    beforeOverlay.classList.remove("unvisible");
+	    });
+	    
+	    playBtn.addEventListener('click' , function() {
+	    	player.play();
+	    	afterOverlay.classList.remove("visible");
+	    	playBtn.classList.remove("visible");
+	    	beforeOverlay.className = "unvisible";
+	    	playOverlay.className = "fullSize";
+	    });
+
+	</script>
+	<!-- .scripts -->
+
+</body>
+</html>
