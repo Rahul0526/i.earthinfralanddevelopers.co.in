@@ -409,7 +409,7 @@ public partial class admin_Test : System.Web.UI.Page
                             string tbl_word = r[1].ToString();
                             string tbl_catagory = r[2].ToString();
                             string tbl_subCategory = r[3].ToString() != "" ? r[3].ToString() : "no sub-catagory";
-                            string tbl_img = r[4].ToString() != "" ? string.Format("<img src='{0}{1}' alt='{2}' />", imgPath, r[4].ToString(), tbl_word) : "";
+                            string tbl_img = r[4].ToString() != "" ? string.Format("<img src='{0}{1}' alt='{2}' /><span title='{2}'>{2}</span>", imgPath, r[4].ToString(), tbl_word) : "";
                             if (tbl_img != "" && images.Count <= 10)
                             {
                                 images.Add(tbl_img);
@@ -469,7 +469,7 @@ public partial class admin_Test : System.Web.UI.Page
                             string tbl_word = r[1].ToString();
                             string tbl_catagory = r[2].ToString();
                             string tbl_subCategory = r[3].ToString() != "" ? r[3].ToString() : "no sub-category";
-                            string tbl_img = r[4].ToString() != "" ? string.Format("<img src='{0}{1}' alt='{2}' />", imgPath, r[4].ToString(), tbl_word) : "";
+                            string tbl_img = r[4].ToString() != "" ? string.Format("<img src='{0}{1}' alt='{2}' /><span title='{2}'>{2}</span>", imgPath, r[4].ToString(), tbl_word) : "";
                             if (tbl_catagory != "")
                             {
                                 int category = 0;

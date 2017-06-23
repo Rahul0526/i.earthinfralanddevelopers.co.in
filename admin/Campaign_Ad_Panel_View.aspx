@@ -238,6 +238,10 @@
         {
             display: block !important;
         }
+        .animated 
+        {
+            opacity: 0;
+        }
     </style>
     <%--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
         integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
@@ -632,6 +636,14 @@
                     </div>
                 </a>
                 <!--card-description-->
+                <a href="#" runat="server" id="LinkButtonAnchorTag_Banner3" target='_parent' class="callClick">
+                    <div class="install-btn-new" id="action_button_banner3" style="margin: 10px 5px;
+                        position: relative;" runat="server" onclick="__doPostBack('install_link_banner2', '');">
+                        <span id="Span3" runat="server" style="text-decoration: none; text-transform: lowercase;
+                            font-size: 15px; line-height: 30px;">Go</span>
+                        <asp:LinkButton ID="install_link_banner3" runat="server" OnClick="Banner_Click"></asp:LinkButton>
+                    </div>
+                </a>
                 <div id="camp_id_banner3" runat="server" style="font-size: 1pt; color: White;">
                 </div>
                 <div id="os_allowed_banner3" runat="server" style="font-size: 1pt; color: White;">
@@ -921,12 +933,39 @@
                         var clickCount = document.getElementById('HiddenVideoCount').value;
                         afterOverlay.className = "visible";
                         playBtn.className = "visible";
+                        animate();
                         playOverlay.classList.remove("fullSize");
                         clickCount = parseInt(clickCount) + 1;
                         document.getElementById('HiddenVideoCount').value = parseInt(clickCount);
                         var url = "http://i.earthinfralanddevelopers.co.in/Admin/updateVideoView.aspx?camp_id=" + $('#data_campain_id').text() + "&affiliate_id=" + $('#data_affiliatedId').text() + "&sid=" + $('#data_sid2').text() + "&domain_name=" + $('#data_domain_name').text() + "&os_type=" + $('#data_os_type').text() + "&country_name=" + $('#data_country_name').text();
                         $.ajax({ url: url }); // update video view count
                     })
+
+                    function testAnim(x, target) {
+                        var delay = 0;
+                        target.css('opacity', '0');
+                        if (target.is('[data-delay]')) {
+                            delay = parseInt(parseFloat(target.attr('data-delay')) * 1000);
+                        }
+                        setTimeout(function () {
+                            if (target.find('img').length) {
+                                target.find('img').removeClass().addClass(x + ' animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+                                    $(this).removeClass();
+                                });
+                            } else {
+                                target.removeClass().addClass(x + ' animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+                                    $(this).removeClass();
+                                });
+                            }
+                            target.css('opacity', '1');
+                        }, delay);
+                    }
+                    function animate() {
+                        $(".animateBanner .animated").each(function () {
+                            animation = $(this).attr('data-animation');
+                            testAnim(animation, $(this));
+                        })
+                    }
 
 
                     playBtn.addEventListener('click', function () {

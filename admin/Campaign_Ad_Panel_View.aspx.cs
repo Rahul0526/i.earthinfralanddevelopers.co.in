@@ -515,11 +515,53 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                             videoBanner1.Visible = true;
                             videoBanner2.Visible = false;
                             panel1.Attributes.Add("style", "background-image:url('" + panel1ImgURL + "')");
-                            panel1.Attributes.Add("class", "animated " + ds.Tables[0].Rows[0].ItemArray[21].ToString());
+                            string panel1Animation = ds.Tables[0].Rows[0].ItemArray[21].ToString();
+                            if (panel1Animation.Contains(","))
+                            {
+                                string[] p1 = panel1Animation.Split(',');
+                                panel1.Attributes.Add("class", "animated");
+                                panel1.Attributes.Add("data-animation", p1[1]);
+                                panel1.Attributes.Add("data-delay", p1[0]);
+                            }
+                            else
+                            {
+                                panel1.Attributes.Add("class", "animated");
+                                panel1.Attributes.Add("data-animation", panel1Animation);
+                                panel1.Attributes.Add("data-delay", "0");
+                            }
+                            
                             panel2_1.Attributes.Add("style", "background-image:url('" + panel2_1ImgURL + "')");
-                            panel2_1.Attributes.Add("class", "animated " + ds.Tables[0].Rows[0].ItemArray[22].ToString());
+                            string panel21Animation = ds.Tables[0].Rows[0].ItemArray[22].ToString();
+                            if (panel21Animation.Contains(","))
+                            {
+                                string[] p1 = panel21Animation.Split(',');
+                                panel2_1.Attributes.Add("class", "animated");
+                                panel2_1.Attributes.Add("data-animation", p1[1]);
+                                panel2_1.Attributes.Add("data-delay", p1[0]);
+                            }
+                            else
+                            {
+                                panel2_1.Attributes.Add("class", "animated");
+                                panel2_1.Attributes.Add("data-animation", panel21Animation);
+                                panel2_1.Attributes.Add("data-delay", "0");
+                            }
+
                             panel2_2.Attributes.Add("style", "background-image:url('" + panel2_2ImgURL + "')");
-                            panel2_2.Attributes.Add("class", "animated " + ds.Tables[0].Rows[0].ItemArray[23].ToString());
+                            string panel22Animation = ds.Tables[0].Rows[0].ItemArray[23].ToString();
+                            if (panel22Animation.Contains(","))
+                            {
+                                string[] p1 = panel22Animation.Split(',');
+                                panel2_2.Attributes.Add("class", "animated");
+                                panel2_2.Attributes.Add("data-animation", p1[1]);
+                                panel2_2.Attributes.Add("data-delay", p1[0]);
+                            }
+                            else
+                            {
+                                panel2_2.Attributes.Add("class", "animated" + panel22Animation);
+                                panel2_2.Attributes.Add("data-animation", panel22Animation);
+                                panel2_2.Attributes.Add("data-delay", "0");
+                            }
+                            //panel2_2.Attributes.Add("class", "animated " + ds.Tables[0].Rows[0].ItemArray[23].ToString());
                         }
                         else if (bannerType == 2)
                         {
@@ -551,9 +593,38 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                             videoBanner1.Visible = false;
                             videoBanner2.Visible = true;
                             panel3.Attributes.Add("style", "background-image:url('" + panel3ImgURL + "')");
-                            panel3.Attributes.Add("class", "animated " + ds.Tables[0].Rows[0].ItemArray[24].ToString());
+                            string panel3Animation = ds.Tables[0].Rows[0].ItemArray[24].ToString();
+                            if (panel3Animation.Contains(","))
+                            {
+                                string[] p1 = panel3Animation.Split(',');
+                                panel3.Attributes.Add("class", "animated");
+                                panel3.Attributes.Add("data-animation", p1[1]);
+                                panel3.Attributes.Add("data-delay", p1[0]);
+                            }
+                            else
+                            {
+                                panel3.Attributes.Add("class", "animated");
+                                panel3.Attributes.Add("data-animation", panel3Animation);
+                                panel3.Attributes.Add("data-delay", "0");
+                            }
+                            //panel3.Attributes.Add("class", "animated " + ds.Tables[0].Rows[0].ItemArray[24].ToString());
+
                             panel4.Attributes.Add("style", "background-image:url('" + panel4ImgURL + "')");
-                            panel4.Attributes.Add("class", "animated " + ds.Tables[0].Rows[0].ItemArray[25].ToString());
+                            string panel4Animation = ds.Tables[0].Rows[0].ItemArray[25].ToString();
+                            if (panel4Animation.Contains(","))
+                            {
+                                string[] p1 = panel4Animation.Split(',');
+                                panel4.Attributes.Add("class", "animated");
+                                panel3.Attributes.Add("data-animation", p1[1]);
+                                panel4.Attributes.Add("data-delay", p1[0]);
+                            }
+                            else
+                            {
+                                panel4.Attributes.Add("class", "animated");
+                                panel3.Attributes.Add("data-animation", panel4Animation);
+                                panel4.Attributes.Add("data-delay", "0");
+                            }
+                            //panel4.Attributes.Add("class", "animated " + ds.Tables[0].Rows[0].ItemArray[25].ToString());
                         }
                         else
                         {
@@ -745,6 +816,7 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                 string colorDescription = Request.QueryString["bg_color"];
                 string button_color = Request.QueryString["button_color"];
                 string banner_id = Request.QueryString["banner_id"];
+                string showCallToAction = Request.QueryString["ShowCallToAct"];
                 con.Open();
                 SqlDataAdapter adp = new SqlDataAdapter("SELECT * FROM [dbo].[campaigns] where campaign_id='" + s1 + "'", con);
                 DataSet ds = new DataSet();
@@ -805,6 +877,25 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                             banner3.Style.Add("background-color", "#" + bg_color);
                             camp_id_banner3.Style.Add("color", "#" + bg_color); os_allowed_banner3.Style.Add("color", "#" + bg_color); sites_allow_banner3.Style.Add("color", "#" + bg_color);
 
+                        }
+
+                        if (showCallToAction == "Show")
+                        {
+                            LinkButtonAnchorTag_Banner3.Visible = true;
+                            action_button_banner3.Visible = true;
+                            install_link_banner3.Visible = true;
+                            if (button_color != "No")
+                            {
+                                action_button_banner3.Style["background-color"] = "#" + button_color.ToString() + "";
+                                action_button_banner3.Style["border-color"] = "#" + Request.QueryString["Banner2BorderColor"].ToString() + "";
+                                Span3.Style.Add("color", "#" + Request.QueryString["banner2TextColor"].ToString());
+                            }
+                            LinkButtonAnchorTag_Banner3.HRef = ds.Tables[0].Rows[0].ItemArray[4].ToString() + "?sid=" + sessionId;
+                        }
+                        else {
+                            LinkButtonAnchorTag_Banner3.Visible = false;
+                            action_button_banner3.Visible = false;
+                            install_link_banner3.Visible = false;
                         }
 
                         banner3_icon_anchor_tag.HRef = ds.Tables[0].Rows[0].ItemArray[4].ToString() + "?sid=" + sessionId;

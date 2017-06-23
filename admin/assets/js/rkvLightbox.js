@@ -52,6 +52,12 @@ $(document).ready(function () {
         $('#' + target + '_2').attr('data-animation', anim);
     })
 
+    $('.lightbox .delay').on('change keyup', function () {
+        var delay = $(this).val();
+        var target = $(this).attr('data-target');
+        $('#' + target).attr('data-delay', delay);
+    })
+
     $('.lightbox .play-animation').on('click', function () {
         $(this).closest('.customizeBanner').find('.animation-preview.input-dropdown').each(function () {
             var anim = $(this).val();
@@ -96,15 +102,23 @@ $(document).ready(function () {
 
 
 function testAnim(x, target) {
-    if ($('#' + target).find('img').length) {
-        $('#' + target).find('img').removeClass().addClass(x + ' animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
-            $(this).removeClass();
-        });
-    } else {
-        $('#' + target).removeClass().addClass(x + ' animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
-            $(this).removeClass();
-        });
+    var delay = 0;
+    $('#' + target).css('opacity', '0');
+    if ($('#' + target).is('[data-delay]')) {
+        delay = parseInt(parseFloat($('#' + target).attr('data-delay')) * 1000);
     }
+    setTimeout(function () {
+        if ($('#' + target).find('img').length) {
+            $('#' + target).find('img').removeClass().addClass(x + ' animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+                $(this).removeClass();
+            });
+        } else {
+            $('#' + target).removeClass().addClass(x + ' animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+                $(this).removeClass();
+            });
+        }
+        $('#' + target).css('opacity', '1');
+    }, delay);
 }
 
 function showOverlayBanner() {

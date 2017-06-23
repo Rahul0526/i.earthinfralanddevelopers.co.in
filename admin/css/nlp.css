@@ -1,4 +1,4 @@
-﻿body 
+body 
 {
     font-family: Arial;
     margin: 0; 
@@ -46,6 +46,7 @@
     padding-left: 12px;
     width: 80%;
     width: calc(100% - 100px);
+    color: #555555;
 }
 .searchBar input:last-child 
 {
@@ -202,8 +203,28 @@
     box-sizing: border-box;
     background: #fafafa;
     position: relative;
+/*     overflow: hidden; */
+    margin: 0 2% 40px 0;
+}
+.imagesContainer div i {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
-    margin: 0 2% 2% 0;
+}
+.imagesContainer div span {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    padding: 0 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    cursor: help;
+    text-align: center;
 }
 .imagesContainer div:nth-child(even) 
 {

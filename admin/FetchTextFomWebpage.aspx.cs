@@ -51,7 +51,7 @@ public partial class admin_FetchTextFomWebpage : System.Web.UI.Page
                 HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
                 HtmlWeb hw = new HtmlWeb();
                 doc = hw.Load(TextBox1.Text);
-                HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes("//body//p[not(ancestor::div[contains(@style,'display:none')]) and not(ancestor::div[contains(@style,'display: none')]) and not(ancestor::header) and not(ancestor::footer)]//text()");
+                HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes("");
                 textContent = "";
                 foreach (var item in nodes)
                 {
