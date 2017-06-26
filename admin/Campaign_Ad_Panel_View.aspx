@@ -5,7 +5,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head id="Head1" runat="server">
-    <META HTTP-EQUIV="Access-Control-Allow-Origin" CONTENT="http://camp.earthinfralanddevelopers.co.in">
+    <META HTTP-EQUIV="Access-Control-Allow-Origin" CONTENT="http://i.earthinfralanddevelopers.co.in">
     <%if (Request.QueryString["View"] != "0") %>
     <% { %>
     <title></title>

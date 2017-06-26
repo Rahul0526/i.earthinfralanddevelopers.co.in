@@ -1,0 +1,163 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script src="js/jquery-1.11.3.min.js" type="text/javascript"></script>
+    <style type="text/css">
+        .string { color: green; }
+        .number { color: darkorange; }
+        .boolean { color: blue; }
+        .null { color: magenta; }
+        .key { color: red; }
+        .form 
+        {
+            display: inline-block;
+            float: left;
+            width: 100%;
+        }
+        .form *
+        {
+            width: 80%;
+            float: left;
+            height: 30px;
+            box-sizing: border-box;
+            padding: 2px 10px;
+        }
+        .form button 
+        {
+            width: 20%;
+        }
+        .col-4 
+        {
+            display: inline-block;
+            float: left;
+            width: 25%;
+            box-sizing: border-box;
+            padding: 0 10px;
+        }
+        img 
+        {
+            max-width: 100%;
+        }
+        #loading 
+        {
+            display: table;
+            float: none;
+            margin: auto;
+        }
+        #content 
+        {
+            display: none;
+        }
+        ul {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          counter-reset: li-counter;
+        }
+        ul li {
+          position: relative;
+          background: rgba(220,220,220,0.15);
+          padding: 2px 0 5px 35px;
+        }
+        ul li:nth-of-type(even) {
+          background: rgba(200,200,200,0.3)
+        }
+        ul li:before {
+          content: counter(li-counter);
+	        counter-increment: li-counter;
+          position: absolute;
+          left: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 30px;
+          height: 100%;
+          text-align: left;
+          text-indent: 5px;
+          background-color: rgba(200,200,200,0.2);
+        }
+        i {
+          opacity: 0.3;
+          margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form">
+        <input type="text" id="pageUrl" placeholder="http://example.com"/>
+        <button id="getData">Get Data</button>
+    </div>
+    <br>
+    <img src="img/loader.gif" id="loading" style="display: none" />
+    <br>
+    <br>
+    <div id="content">
+        <h1>Page Category : <span id="pageCategory"></span></h1>
+        <h2>Page Language : <span id="pageLanguage"></span></h2>
+        <div class="col-4">
+            <h3>Keywords</h3>
+            <ul id="keywords"></ul>
+        </div>
+        <div class="col-4">
+            <h3>Entities</h3>
+            <ul id="entities"></ul>
+        </div>
+        <div class="col-4">
+            <h3>New Wrods</h3>
+            <ul id="new-words"></ul>
+        </div>
+        <div class="col-4">
+            <h3>Images</h3>
+            <ul id="images"></ul>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#getData").on("click", function () {
+                var pageUrl = "http://i.earthinfralanddevelopers.co.in/admin/nlp.ashx?page=" + $.trim($("#pageUrl").val());
+
+                //parameter = JSON.stringify({ "testPage": "http://news.nationalgeographic.com/2017/04/jungle-dogs-peru-amazon-rare" });
+                //            parameter = JSON.stringify({ "URL": "Hello" });
+                //var pageUrl = 'http://i.earthinfralanddevelopers.co.in/admin/nlp.ashx?page=http://news.nationalgeographic.com/2017/04/jungle-dogs-peru-amazon-rare';
+                $.ajax({
+                    //type: 'GET',
+                    url: pageUrl,
+                    //data: parameter,
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    beforeSend: function () {
+                        $("#loading").show();
+                        $("#content").hide();
+                    },
+                    success: function (data) {
+                        //alert(JSON.stringify(data))
+                        $('#pageCategory').html(data["page-category"]);
+                        $('#pageLanguage').html(data["page-language"]);
+                        $.each(data["keywords"], function (i, val) {
+                            $('#keywords').append("<li>" + val + "</li>");
+                        })
+                        $.each(data["entities"], function (i, val) {
+                            $('#entities').append("<li>" + val["entity"] + " <i>" + val["sub-category"] + "</i></li>");
+                        })
+                        $.each(data["new-words"], function (i, val) {
+                            $('#new-words').append("<li>" + val + "</li>");
+                        })
+                        $.each(data["images"], function (i, val) {
+                            $('#images').append("<li>" + "<img src=\"" + val["img"] + "\" alt=\"" + val["word"] + "\"/></li>");
+                        })
+                        $("#content").show();
+                        $("#loading").hide();
+                        //                    $('#entities').html(data[""]);
+                        //                    $('#new-words').html(data[""]);
+                        //                    $('#images').html(data[""]);
+                    },
+                    error: function (data, success, error) {
+                        alert("Error : " + error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

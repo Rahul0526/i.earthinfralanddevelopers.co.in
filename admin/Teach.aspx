@@ -620,7 +620,7 @@
                     }
                     data.append('word_id', word_id);
                     $.ajax({
-                        url: "camp.ashx",
+                        url: "uploadEntityImage.ashx",
                         type: "POST",
                         processData: false,
                         contentType: false,

@@ -14,8 +14,8 @@ function initJQuery() {
     } else {
     $(function () {
         AddNo = 1;
-        //domain = "http://i.earthinfralanddevelopers.co.in/";
-        domain = "../";
+        domain = "http://i.earthinfralanddevelopers.co.in/";
+        // domain = "../";
 
         function LoadAd(IsView, EncryptedString, targetElem) {
             var PasteString = CryptoJS.AES.decrypt(EncryptedString, "AUGURS001").toString(CryptoJS.enc.Utf8);
@@ -95,13 +95,11 @@ function initJQuery() {
                         isp = data['isp'].split(' ')[0];
                         if (1 == 1) {
                             var url = domain + "Admin/Campaign_Ad_Panel_View.aspx?camp_id=0&sid=&request_type=" + req_type + "&affiliate_id=" + Affiliate_id + "&domain_name=" + domain_name + "&bg_color=" + bg_color + "&button_color=" + button_color + "&banner_id=" + banner_id + "&os_type=" + os_type + "&country_name=" + country + "&isp=" + isp + "&View=0&AdToLoad=" + AdToLoad + "&NoOfBanner1=" + total_banner1 + "&Banner2BorderColor=" + Banner2BorderColor + "&banner2TextColor=" + Banner2textColor + "&AdPageUrl=" + AdPageUrl + "&Country=" + country + "&TitleColor=" + TitleColor + "&DescriptionColor=" + DescriptionColor + "&BorderColor=" + BorderColor + "&PageBackColor=" + PageBackColor + "&ShowCallToAct=" + ShowCallToAct + "&showImage=" + showImage + "&PassBackId=" + PassBackId + "&width=" + $('#DivControl').parent().width();
-                            alert(url)
                             $.ajax({
                                 url: url,
                                 success: function (response) {
                                     $arr = response.split("<!");
                                     result = $.trim($arr[0]);
-                                    alert(result)
                                     if (!(result.indexOf('alert(') >= 0)) {
                                         var url1 = "";
                                         if (result != "" || banner_id == "Banner 1" || banner_id == "Banner 4") {
