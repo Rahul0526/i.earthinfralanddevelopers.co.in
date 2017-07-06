@@ -174,8 +174,8 @@ public class DalValidateAdTags
                     dtcampDetails.Rows.Add(dr);
             }
 
-         DataTable ReturnedData= AudienceInterestAlgorithms(dtcampDetails);
-         int campaignPosition = SetCampPriority(ReturnedData);
+            DataTable ReturnedData= AudienceInterestAlgorithms(dtcampDetails);
+            int campaignPosition = SetCampPriority(ReturnedData);
             string[] Arr={ReturnedData.Rows[campaignPosition]["campid"].ToString()};
             return Arr;
         }
@@ -183,8 +183,8 @@ public class DalValidateAdTags
         {
 
             string[] Arr = { "InvalidCampaign" };
-            return Arr;
-          return null;
+            //return Arr;
+            return null;
          }
 
 

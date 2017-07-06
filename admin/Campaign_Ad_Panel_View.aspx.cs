@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web.UI.HtmlControls;
 using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Text;
-using System.Net;
 using System.Drawing;
 using System.IO;
 using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 
 public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
 {
@@ -42,8 +38,8 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
     //public string domain = "http://i.earthinfralanddevelopers.co.in/";
     public string domain = "d:\\WebSpace\\kkstudies\\camp.earthinfralanddevelopers.co.in\\wwwroot\\";
     DALGetKeyWords dlGetKeyWords = new DALGetKeyWords();
-    DALCampaignPriorityList dlPriorityList = new DALCampaignPriorityList();
-    DalValidateAdTags dlValidateTags = new DalValidateAdTags();
+    readonly DALCampaignPriorityList _dlPriorityList = new DALCampaignPriorityList();
+    readonly DalValidateAdTags _dlValidateTags = new DalValidateAdTags();
     SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["conn"].ConnectionString);
 
     protected void Page_Load(object sender, EventArgs e)
@@ -155,7 +151,7 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
             #region ReadCookies
             string ComputerId = this.ReadCookies();
             if (ComputerId != string.Empty)
-                campArr = dlValidateTags.SetCookiePriority(ComputerId, banner_id);
+                campArr = _dlValidateTags.SetCookiePriority(ComputerId, banner_id);
             #endregion
             int noOfAds = Convert.ToInt32(Request.QueryString["NoOfBanner1"]);
             string query = string.Empty;
@@ -163,7 +159,7 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
             string campIdFilter = "";
             bool checkConversions = true;
             string todaysConversions = "(SELECT count(AffiliateId) FROM getConversion as gCon JOIN view_click_maintain_on_daily_base as clicks ON gCon.Clickid = clicks.ClickId WHERE gCon.campaignId =campaigns.campaign_id AND [date]=CAST(GETDATE() AS DATE)) as ConversionsDoneToday";
-            string LimitConversionsInQuery = "(campaigns.dailyCapping IS NULL OR (campaigns.dailyCapping IS not null AND campaigns.dailyCapping > (SELECT count(AffiliateId) FROM getConversion as gCon JOIN view_click_maintain_on_daily_base as clicks ON gCon.Clickid = clicks.ClickId WHERE gCon.campaignId = campaigns.campaign_id AND [date]=CAST(GETDATE() AS DATE))))";
+            string LimitConversionsInQuery = "(campaigns.dailyCapping IS NULL OR campaigns.dailyCapping = 0 OR (campaigns.dailyCapping IS not null AND campaigns.dailyCapping > (SELECT count(AffiliateId) FROM getConversion as gCon JOIN view_click_maintain_on_daily_base as clicks ON gCon.Clickid = clicks.ClickId WHERE gCon.campaignId = campaigns.campaign_id AND [date]=CAST(GETDATE() AS DATE))))";
             DataSet ds = new DataSet();
             string HostedPageUrl = Request.QueryString["AdPageUrl"];
             if (Request.QueryString["camp_id"].ToString() != "undefined" && Request.QueryString["camp_id"].ToString() != "0")
@@ -190,7 +186,7 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                 }
                 reader.Close();
                 con.Close();
-                if (checkConversion && conversions >= capping) {
+                if (checkConversion && capping != 0 && conversions >= capping) {
                     return "";
                 }
             }
@@ -201,10 +197,10 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                 if (banner_id == "Banner 1" || banner_id == "Banner 4")
                 {
                     //another ad from here. we got 
-                    query = "select top(" + noOfAds + ") [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url]  FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + "' and country_targeted like '%" + Request.QueryString["country_name"] + "%' AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' ORDER BY NEWID() ";
+                    query = "select top(" + noOfAds + ") [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url]  FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + "' and (country_targeted like '%" + Request.QueryString["country_name"] + "%' OR country_targeted = '') AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' ORDER BY NEWID() ";
                     KeyWordBasedCampId = dlGetKeyWords.MatchedCampaigns(HostedPageUrl, banner_id, Request.QueryString["country_name"], Request.QueryString["os_type"], noOfAds, maxConversions);
 
-                    dspage = dlPriorityList.GetPriorityCampaignList(Request.QueryString["AdPageUrl"], banner_id, Request.QueryString["country_name"], Request.QueryString["os_type"], noOfAds, KeyWordBasedCampId, campArr, ComputerId, LimitConversionsInQuery);
+                    dspage = _dlPriorityList.GetPriorityCampaignList(Request.QueryString["AdPageUrl"], banner_id, Request.QueryString["country_name"], Request.QueryString["os_type"], noOfAds, KeyWordBasedCampId, campArr, ComputerId, LimitConversionsInQuery);
                     //dspage = KeyWordBasedCampId;                                   
                     ds = dspage;
                     checkConversions = false;
@@ -212,7 +208,7 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                 }
                 else if (banner_id == "Banner 5")
                 {
-                    query = "SELECT  [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url],[imageA],[imageB],[imageC],[imageD],[imageE],[animationA],[animationB],[animationC],[animationD],[animationE],[bannerType],[videoPlayBtn] FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + campIdFilter + "' and country_targeted like '%" + Request.QueryString["country_name"] + "%' AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery + " ORDER BY NEWID() ";
+                    query = "SELECT  [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url],[imageA],[imageB],[imageC],[imageD],[imageE],[animationA],[animationB],[animationC],[animationD],[animationE],[bannerType],[videoPlayBtn] FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + campIdFilter + "' and (country_targeted like '%" + Request.QueryString["country_name"] + "%' OR country_targeted = '') AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery + " ORDER BY NEWID() ";
                     KeyWordBasedCampId = dlGetKeyWords.MatchedCampaigns(Request.QueryString["domain_name"], banner_id, Request.QueryString["country_name"], Request.QueryString["os_type"], noOfAds, maxConversions);
                     if (KeyWordBasedCampId != null && KeyWordBasedCampId.Tables[0].Rows.Count > 0)
                     {
@@ -254,13 +250,13 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                     }
                     if (CookieCampId != string.Empty)
                     {
-                        query = "SELECT  [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url],[ShowCallToAction]," + todaysConversions + " FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + campIdFilter + "' and campaign_id='" + CookieCampId + "' and country_targeted like '%" + Request.QueryString["country_name"] + "%' AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery + " ORDER BY NEWID() ";
+                        query = "SELECT  [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url],[ShowCallToAction]," + todaysConversions + " FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + campIdFilter + "' and campaign_id='" + CookieCampId + "' and (country_targeted like '%" + Request.QueryString["country_name"] + "%' OR country_targeted = '') AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery + " ORDER BY NEWID() ";
 
                     }
                     else
                     {
 
-                        query = "SELECT  [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url],[ShowCallToAction]," + todaysConversions + " FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + campIdFilter + "' and country_targeted like '%" + Request.QueryString["country_name"] + "%' AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery + " ORDER BY NEWID() ";
+                        query = "SELECT  [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url],[ShowCallToAction]," + todaysConversions + " FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + campIdFilter + "' and (country_targeted like '%" + Request.QueryString["country_name"] + "%' OR country_targeted = '') AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery + " ORDER BY NEWID() ";
 
                         KeyWordBasedCampId = dlGetKeyWords.MatchedCampaigns(Request.QueryString["domain_name"], banner_id, Request.QueryString["country_name"], Request.QueryString["os_type"], noOfAds, maxConversions);
                         if (KeyWordBasedCampId != null && KeyWordBasedCampId.Tables[0].Rows.Count > 0)
@@ -1006,6 +1002,15 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                     if (Request.QueryString["View"] != null)
                     {   
                         int viewState = int.Parse(Request.QueryString["View"].ToString().Trim());
+                        string affiliate_id = Request.QueryString["affiliate_id"];
+                        string domain_name = Request.QueryString["domain_name"];
+                        string os_type = Request.QueryString["os_type"];
+                        string country = Request.QueryString["country_name"];
+                        string state = Request.QueryString["state_name"];
+                        string city = Request.QueryString["city_name"];
+                        string ISP = Request.QueryString["isp"];
+                        string lon = Request.QueryString["lon"];
+                        string lat = Request.QueryString["lat"];
                         if (viewState == 1)
                         {
                             if (banner_id == "Banner 1" || banner_id == "Banner 4")
@@ -1019,13 +1024,12 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                             {
                                 increase_view_of_ad(s1, banner_id, sessionId);
                             }
+                            storeRequestLocation(s1, affiliate_id, domain_name, os_type, country, state, city, ISP, lon, lat);
                         }
                         else
                         {
                             if (viewState != 0)
                             {
-                                string affiliate_id = Request.QueryString["affiliate_id"];
-                                string domain_name = Request.QueryString["domain_name"];
                                 string event_type = "";
                                 if (banner_id == "Banner 5")
                                     event_type = "Impression";
@@ -1035,13 +1039,14 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                                 {
                                     for (int countLoop = 0; countLoop < int.Parse(Request.QueryString["NoOfBanner1"].ToString().Trim()); countLoop++)
                                     {
-                                        IncreaseAdRequest(dspage.Tables[0].Rows[countLoop].ItemArray[0].ToString(), affiliate_id, domain_name, event_type, Request.QueryString["os_type"].ToString(), Request.QueryString["Country"].ToString(), sessionId);
+                                        IncreaseAdRequest(dspage.Tables[0].Rows[countLoop].ItemArray[0].ToString(), affiliate_id, domain_name, event_type, os_type, country, sessionId);
                                     }
                                 }
                                 else
                                 {
-                                    IncreaseAdRequest(s1, affiliate_id, domain_name, event_type, Request.QueryString["os_type"].ToString(), Request.QueryString["Country"].ToString(), sessionId);
+                                    IncreaseAdRequest(s1, affiliate_id, domain_name, event_type, os_type, country, sessionId);
                                 }
+                                storeRequestLocation(s1, affiliate_id, domain_name, os_type, country, state, city, ISP, lon, lat);
                             }
                         }
                     }
@@ -1691,6 +1696,36 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
 
         }
     }
+
+
+    protected void storeRequestLocation(string camp_id, string affiliate_id, string domain_name, string os_type, string country, string state, string city, string ISP, string lon, string lat) {
+        try
+        {
+            if (con.State == ConnectionState.Closed)
+                con.Open();
+            string sqlQuery = string.Empty;
+            sqlQuery = "insert into add_request_origions (affiliate_id,campaign_id,country_name,state_name,city_name,OS_type,domain_name,ISP,longitude,latitude,date_time) values(@affiliate_id,@campaign_id,@country_name,@state_name,@city_name,@OS_type,@domain_name,@ISP,@longitude,@latitude,GETDATE())";
+            SqlCommand cmd = new SqlCommand(sqlQuery, con);
+            cmd.Parameters.AddWithValue("@affiliate_id",affiliate_id);
+            cmd.Parameters.AddWithValue("@campaign_id",camp_id);
+            cmd.Parameters.AddWithValue("@country_name", country);
+            cmd.Parameters.AddWithValue("@state_name",state);
+            cmd.Parameters.AddWithValue("@city_name",city);
+            cmd.Parameters.AddWithValue("@OS_type",os_type);
+            cmd.Parameters.AddWithValue("@domain_name",domain_name);
+            cmd.Parameters.AddWithValue("@ISP",ISP);
+            cmd.Parameters.AddWithValue("@longitude",lon);
+            cmd.Parameters.AddWithValue("@latitude",lat);
+            cmd.CommandType = CommandType.Text;
+            int confirmation = cmd.ExecuteNonQuery();
+            con.Close();
+        }
+        catch
+        {
+        }
+    }
+
+
     protected void IncreaseAdRequest(string camp_id, string affiliate_id, string domain_name, string event_name, string OsType, string CountryName, string sid)
     {
         try

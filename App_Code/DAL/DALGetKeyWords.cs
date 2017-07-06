@@ -1,20 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Web;
 using System.Xml.Linq;
 using System.Data;
-using System.Xml.Serialization;
-using AlchemyAPI;
-using System.Web.UI;
-using System.Data;
 using System.Data.SqlClient;
-using System.Web.UI.WebControls;
 using System.Configuration;
 using System.Net;
-using System.Xml;
 
 
 public class DALGetKeyWords
@@ -26,23 +16,24 @@ public class DALGetKeyWords
     }
 
     #region GetSiteKeyWords
-    public DataSet MatchedCampaigns(string PageUrl, string BannerType, string Country, string OsType, int NoOfAds, int maxConversions)
+    public DataSet MatchedCampaigns(string pageUrl, string bannerType, string country, string osType, int noOfAds, int maxConversions)
     {
         try
         {
             string todaysConversions = "(SELECT count(AffiliateId) FROM getConversion as gCon JOIN view_click_maintain_on_daily_base as clicks ON gCon.Clickid = clicks.ClickId WHERE gCon.campaignId =campaigns.campaign_id AND [date]=CAST(GETDATE() AS DATE))";
-            bool CombinationFlag = CheckCombination(BannerType, Country, OsType, todaysConversions, maxConversions);
-            if (CombinationFlag == true)
+            bool combinationFlag = CheckCombination(bannerType, country, osType, todaysConversions, maxConversions);
+            if (combinationFlag == true)
             {
                 #region Get keywords from web page
 
                 #region Setting page Url
-                // PageUrl = "http://camp.otsinfra.org/Admin/create_new_campaign.aspx";
+                pageUrl = "http://news.nationalgeographic.com/2017/04/jungle-dogs-peru-amazon-rare";
                 #endregion
 
-
                 string Apikey = "4a5075dbb713f58f60e3acf8f924fa41c9555287";                                   //"e9370cd124274b2dcd0cc7735ad912eb6be52f79";
-                string ApiUrl = "https://gateway-a.watsonplatform.net/calls/url/URLGetRankedKeywords?apikey=" + Apikey + "&url=" + PageUrl;
+                //string ApiUrl = "https://gateway-a.watsonplatform.net/calls/url/URLGetRankedKeywords?apikey=" + Apikey + "&url=" + pageUrl; // ibm api
+                string ApiUrl = "http://i.earthinfralanddevelopers.co.in/admin/nlp.ashx?apikey=" + Apikey + "&page=" + pageUrl;
+
                 var ApiRequest = (HttpWebRequest)WebRequest.Create(ApiUrl);
                 ApiRequest.Method = "GET";
                 ApiRequest.ContentType = "application/xml";
@@ -64,10 +55,11 @@ public class DALGetKeyWords
                         {
                             try
                             {
-                                if (keyList == string.Empty)
-                                    keyList = keys.Element("text").Value.ToString();
-                                else
-                                    keyList = keyList + "," + keys.Element("text").Value.ToString();
+                                keyList += keyList == string.Empty ? keys.Value.ToString() : "," + keys.Value.ToString();
+                                //if (keyList == string.Empty)
+                                //    keyList = keys.Element("text").Value.ToString();
+                                //else
+                                //    keyList = keyList + "," + keys.Element("text").Value.ToString();
                             }
                             catch
                             {
@@ -76,7 +68,7 @@ public class DALGetKeyWords
                         }
                     }
                 }
-                DataSet dsReturnCampaigns = GetMatchedCampaigns(keyList, BannerType, Country, OsType, NoOfAds);
+                DataSet dsReturnCampaigns = GetMatchedCampaigns(keyList, bannerType, country, osType, noOfAds);
                 #endregion Get keywords from web page
                 return dsReturnCampaigns;
 
@@ -84,7 +76,7 @@ public class DALGetKeyWords
             else
             {
                 #region Get Possible Combinations
-                string Query = "SELECT top(" + NoOfAds + ") [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url] FROM [dbo].[campaigns]  where Add_style_formate='" + BannerType + "' and country_targeted like '%" + Country + "%' and device_and_action like '%" + OsType + "%'     and (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + todaysConversions + " <= " + maxConversions + " ORDER BY NEWID() ";
+                string Query = "SELECT top(" + noOfAds + ") [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url] FROM [dbo].[campaigns]  where Add_style_formate='" + bannerType + "' and country_targeted like '%" + country + "%' and device_and_action like '%" + osType + "%'     and (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + todaysConversions + " <= " + maxConversions + " ORDER BY NEWID() ";
                 SqlConnection con = new SqlConnection(strcon);
                 con.Open();
                 SqlDataAdapter adp = new SqlDataAdapter(Query, con);
@@ -93,7 +85,7 @@ public class DALGetKeyWords
                 con.Close();
                 #endregion
 
-                if (BannerType == "Banner 1" || BannerType == "Banner 4")
+                if (bannerType == "Banner 1" || bannerType == "Banner 4")
                 { return null; }
                 else
                 {
@@ -119,7 +111,7 @@ public class DALGetKeyWords
             SqlConnection con = new SqlConnection(strcon);
             string[] KeyArray = KeyList.Split(',');
             string Query = string.Empty;
-            Query = "SELECT top(" + NoOfAdsBanner + ") [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url]  FROM [dbo].[campaigns]  where Add_style_formate='" + BannerType + "' and country_targeted like '%" + Country + "%'  and (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running'      ORDER BY NEWID() ";
+            Query = "SELECT top(" + NoOfAdsBanner + ") [campaign_id],[campaigin_name],[title],[discription],[url],[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url]  FROM [dbo].[campaigns] where Add_style_formate='" + BannerType + "' and country_targeted like '%" + Country + "%' and (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' ORDER BY NEWID() ";
 
             string OrCondition = string.Empty;
             foreach (string Key in KeyArray)
@@ -135,7 +127,7 @@ public class DALGetKeyWords
                 #region Add Condition for  No Keywords
                 // OrCondition = OrCondition + "or keywords=''";
                 #endregion
-                Query = "SELECT top(" + NoOfAdsBanner + ") [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url]  FROM [dbo].[campaigns]  where Add_style_formate='" + BannerType + "' and country_targeted like '%" + Country + "%'  and (" + OrCondition + ")  and (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running'  ORDER BY NEWID() ";
+                Query = "SELECT top(" + NoOfAdsBanner + ") [campaign_id],[campaigin_name],[title],[discription],[url],[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url]  FROM [dbo].[campaigns] where Add_style_formate='" + BannerType + "' and country_targeted like '%" + Country + "%' and (" + OrCondition + ") and (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' ORDER BY NEWID() ";
             }
             con.Open();
             SqlDataAdapter adp = new SqlDataAdapter(Query, con);

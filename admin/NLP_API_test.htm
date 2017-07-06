@@ -93,7 +93,7 @@
     <br>
     <br>
     <div id="content">
-        <h1>Page Category : <span id="pageCategory"></span></h1>
+        <!--<h1>Page Category : <span id="pageCategory"></span></h1>
         <h2>Page Language : <span id="pageLanguage"></span></h2>
         <div class="col-4">
             <h3>Keywords</h3>
@@ -110,12 +110,13 @@
         <div class="col-4">
             <h3>Images</h3>
             <ul id="images"></ul>
-        </div>
+        </div>-->
     </div>
     <script type="text/javascript">
         $(document).ready(function () {
             $("#getData").on("click", function () {
-                var pageUrl = "http://i.earthinfralanddevelopers.co.in/admin/nlp.ashx?page=" + $.trim($("#pageUrl").val());
+                var pageUrl = "nlp.ashx?page=" + $.trim($("#pageUrl").val());
+                //var pageUrl = "http://i.earthinfralanddevelopers.co.in/admin/nlp.ashx?page=" + $.trim($("#pageUrl").val());
 
                 //parameter = JSON.stringify({ "testPage": "http://news.nationalgeographic.com/2017/04/jungle-dogs-peru-amazon-rare" });
                 //            parameter = JSON.stringify({ "URL": "Hello" });
@@ -124,33 +125,30 @@
                     //type: 'GET',
                     url: pageUrl,
                     //data: parameter,
-                    contentType: 'application/json; charset=utf-8',
-                    dataType: 'json',
+                    //contentType: 'application/json; charset=utf-8',
+                    //dataType: 'json',
                     beforeSend: function () {
                         $("#loading").show();
                         $("#content").hide();
                     },
                     success: function (data) {
-                        //alert(JSON.stringify(data))
-                        $('#pageCategory').html(data["page-category"]);
-                        $('#pageLanguage').html(data["page-language"]);
-                        $.each(data["keywords"], function (i, val) {
-                            $('#keywords').append("<li>" + val + "</li>");
-                        })
-                        $.each(data["entities"], function (i, val) {
-                            $('#entities').append("<li>" + val["entity"] + " <i>" + val["sub-category"] + "</i></li>");
-                        })
-                        $.each(data["new-words"], function (i, val) {
-                            $('#new-words').append("<li>" + val + "</li>");
-                        })
-                        $.each(data["images"], function (i, val) {
-                            $('#images').append("<li>" + "<img src=\"" + val["img"] + "\" alt=\"" + val["word"] + "\"/></li>");
-                        })
-                        $("#content").show();
-                        $("#loading").hide();
-                        //                    $('#entities').html(data[""]);
-                        //                    $('#new-words').html(data[""]);
-                        //                    $('#images').html(data[""]);
+                        $('#content').html(data.d);
+                        //$('#pageCategory').html(data["page-category"]);
+                        //$('#pageLanguage').html(data["page-language"]);
+                        //$.each(data["keywords"], function (i, val) {
+                        //    $('#keywords').append("<li>" + val + "</li>");
+                        //})
+                        //$.each(data["entities"], function (i, val) {
+                        //    $('#entities').append("<li>" + val["entity"] + " <i>" + val["sub-category"] + "</i></li>");
+                        //})
+                        //$.each(data["new-words"], function (i, val) {
+                        //    $('#new-words').append("<li>" + val + "</li>");
+                        //})
+                        //$.each(data["images"], function (i, val) {
+                        //    $('#images').append("<li>" + "<img src=\"" + val["img"] + "\" alt=\"" + val["word"] + "\"/></li>");
+                        //})
+                        //$("#content").show();
+                        //$("#loading").hide();
                     },
                     error: function (data, success, error) {
                         alert("Error : " + error);
