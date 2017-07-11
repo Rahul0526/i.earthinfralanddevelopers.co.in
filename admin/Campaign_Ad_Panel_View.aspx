@@ -1011,7 +1011,8 @@
 				}
 				function call(href) {
 					/*$('#Clickbanner6').trigger('click');*/
-					var url = "http://i.earthinfralanddevelopers.co.in/admin/updateAddClicks.aspx?camp_id=" + $('#data_campain_id').text() + "&banner_id=" + $('#data_bannerId').text() + "&affiliate_id=" + $('#data_affiliatedId').text() + "&sid=" + $('#data_sid2').text() + "&domain_name=" + $('#data_domain_name').text() + "&os_type=" + $('#data_os_type').text() + "&country_name=" + $('#data_country_name').text();
+                    //var url = "http://i.earthinfralanddevelopers.co.in/admin/updateAddClicks.aspx?camp_id=" + $('#data_campain_id').text() + "&banner_id=" + $('#data_bannerId').text() + "&affiliate_id=" + $('#data_affiliatedId').text() + "&sid=" + $('#data_sid2').text() + "&domain_name=" + $('#data_domain_name').text() + "&os_type=" + $('#data_os_type').text() + "&country_name=" + $('#data_country_name').text() + "&state=<%=Request.QueryString["state_name"]%>&city=<%=Request.QueryString["city_name"]%>&ISP=<%=Request.QueryString["isp"]%>&longitude=<%=Request.QueryString["lon"]%>&latitude=<%=Request.QueryString["lat"]%>";
+                    var url = "../admin/updateAddClicks.aspx?camp_id=" + $('#data_campain_id').text() + "&banner_id=" + $('#data_bannerId').text() + "&affiliate_id=" + $('#data_affiliatedId').text() + "&sid=" + $('#data_sid2').text() + "&domain_name=" + $('#data_domain_name').text() + "&os_type=" + $('#data_os_type').text() + "&country_name=" + $('#data_country_name').text() + "&state=<%=Request.QueryString["state_name"]%>&city=<%=Request.QueryString["city_name"]%>&ISP=<%=Request.QueryString["isp"]%>&longitude=<%=Request.QueryString["lon"]%>&latitude=<%=Request.QueryString["lat"]%>";
 					//alert(url);
 					$.ajax({
 						url: url,

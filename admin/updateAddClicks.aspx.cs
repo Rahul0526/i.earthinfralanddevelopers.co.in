@@ -23,6 +23,11 @@ public partial class admin_updateAddClicks : System.Web.UI.Page
                 string sid = Request.QueryString["sid"];
                 string os_type = Request.QueryString["os_type"];
                 string CountryName = Request.QueryString["country_name"];
+                string state = Request.QueryString["state"];
+                string city = Request.QueryString["city"];
+                string ISP = Request.QueryString["ISP"];
+                string lon = Request.QueryString["longitude"];
+                string lat = Request.QueryString["latitude"];
 
                 con.Open();
                 SqlDataAdapter adp = new SqlDataAdapter("select * from campain_details where campain_id='" + campaign_id + "'", con);
@@ -122,6 +127,7 @@ public partial class admin_updateAddClicks : System.Web.UI.Page
                     //start
                     string event_type = "Click";
                     maintain_per_view(campaign_id, affiliate_id, domain_name, event_type, os_type, CountryName, sid);//this function will return nothing
+                    storeRequestLocation(event_type, campaign_id, affiliate_id, domain_name, os_type, CountryName, state, city, ISP, lon, lat);
                     //if (Request.QueryString["banner_id"] == "Banner 5")
                     //{
                     //    event_type = "View";
@@ -198,6 +204,7 @@ public partial class admin_updateAddClicks : System.Web.UI.Page
 
         }
     }
+
     protected void maintain_per_view(string camp_id, string affiliate_id, string domain_name, string event_name, string OsType, string CountryName, string sid)
     {
         try
@@ -250,4 +257,34 @@ public partial class admin_updateAddClicks : System.Web.UI.Page
 
         }
     }
+
+    protected void storeRequestLocation(string eventType, string camp_id, string affiliate_id, string domain_name, string os_type, string country, string state, string city, string ISP, string lon, string lat)
+    {
+        try
+        {
+            if (con.State == ConnectionState.Closed)
+                con.Open();
+            string sqlQuery = string.Empty;
+            sqlQuery = "insert into add_request_origions (request_type,affiliate_id,campaign_id,country_name,state_name,city_name,OS_type,domain_name,ISP,longitude,latitude,date_time) values(@request_type,@affiliate_id,@campaign_id,@country_name,@state_name,@city_name,@OS_type,@domain_name,@ISP,@longitude,@latitude,GETDATE())";
+            SqlCommand cmd = new SqlCommand(sqlQuery, con);
+            cmd.Parameters.AddWithValue("@request_type", eventType);
+            cmd.Parameters.AddWithValue("@affiliate_id", affiliate_id);
+            cmd.Parameters.AddWithValue("@campaign_id", camp_id);
+            cmd.Parameters.AddWithValue("@country_name", country);
+            cmd.Parameters.AddWithValue("@state_name", state);
+            cmd.Parameters.AddWithValue("@city_name", city);
+            cmd.Parameters.AddWithValue("@OS_type", os_type);
+            cmd.Parameters.AddWithValue("@domain_name", domain_name);
+            cmd.Parameters.AddWithValue("@ISP", ISP);
+            cmd.Parameters.AddWithValue("@longitude", lon);
+            cmd.Parameters.AddWithValue("@latitude", lat);
+            cmd.CommandType = CommandType.Text;
+            int confirmation = cmd.ExecuteNonQuery();
+            con.Close();
+        }
+        catch
+        {
+        }
+    }
+
 }

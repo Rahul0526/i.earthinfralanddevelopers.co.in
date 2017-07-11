@@ -650,7 +650,6 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
             return null;
         }
     }
-
     public string RezizeImage(int maxWidth, int maxHeight, string domain, string imgName)
     {
         try
@@ -708,7 +707,6 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
         }
         catch (Exception ex) { return ""; }
     }
-
     private string ReadCookies()
     {
         try
@@ -1024,7 +1022,7 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                             {
                                 increase_view_of_ad(s1, banner_id, sessionId);
                             }
-                            storeRequestLocation(s1, affiliate_id, domain_name, os_type, country, state, city, ISP, lon, lat);
+                            storeRequestLocation("Request",s1, affiliate_id, domain_name, os_type, country, state, city, ISP, lon, lat);
                         }
                         else
                         {
@@ -1046,7 +1044,7 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                                 {
                                     IncreaseAdRequest(s1, affiliate_id, domain_name, event_type, os_type, country, sessionId);
                                 }
-                                storeRequestLocation(s1, affiliate_id, domain_name, os_type, country, state, city, ISP, lon, lat);
+                                storeRequestLocation("Request",s1, affiliate_id, domain_name, os_type, country, state, city, ISP, lon, lat);
                             }
                         }
                     }
@@ -1241,25 +1239,6 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
             Response.Redirect(Request.RawUrl);
         }
     }
-
-
-    [System.Web.Services.WebMethod(EnableSession = true)]
-    //public static string callBanner1Click(string campID)
-    //{
-    //    Campaign_Ad_Panel_View c1 = new Campaign_Ad_Panel_View();
-    //    string banner_id = HttpContext.Current.Session["bnrID"].ToString();
-    //    //string sid = HttpContext.Current.Session["sid"].ToString();
-    //    string sid = HttpContext.Current.Session["sid"].ToString();
-    //    HttpContext.Current.Session["sid"] = RandomString(24);
-    //    string Website = HttpContext.Current.Session["UserWebsite"].ToString();
-    //    string affiliate_id = HttpContext.Current.Session["affID"].ToString();
-    //    string domain_name = HttpContext.Current.Session["domName"].ToString();
-    //    string OsType = HttpContext.Current.Session["OsType"].ToString();
-    //    string CountryName = HttpContext.Current.Session["CountryName"].ToString();
-    //    DataSet dspage = HttpContext.Current.Session["dspage"] as DataSet;
-    //    c1.clicklbanner1(campID, Website, affiliate_id, domain_name, banner_id, OsType, CountryName, sid, dspage);
-    //    return "success";
-    //}
     private void clicklbanner1(string campID, string webSite, string affiliateId, string domainName, string bannerId, string OsType, string CountryName, string sid, DataSet dspage)
     {
 
@@ -1415,162 +1394,7 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
         }
         //if (bannerId == "Banner 1")
         //    RanderColasualbanner1(sid.ToString(), bannerId.ToString(), dspage);
-
     }
-    //protected void banner1_click(object sender, EventArgs e)
-    //{
-    //    string affiliate_id = "N/A";
-    //    string domain_name = "N/A";
-    //    string Website = "N/A";
-    //    try
-    //    {
-    //        Button theButton = (Button)sender;
-    //        string ID = theButton.Attributes["ID"];
-    //        ScriptManager.RegisterStartupScript(this, this.GetType(), "Warning", "VideoEvent();", true);
-    //        string campaign_id = "";
-    //        if (banner3.Visible == true)
-    //        {
-    //            campaign_id = camp_id_banner3.InnerText;
-    //        }
-    //        else if (banner4.Visible == true)
-    //        {
-    //            campaign_id = camp_id_banner4.Value;
-    //        }
-    //        else if (banner5.Visible == true)
-    //        {
-    //            campaign_id = camp_id_banner5.InnerText;
-    //        }
-    //        else if (banner6.Visible == true)
-    //        {
-    //            campaign_id = hdnfBanner2Code.Value;
-    //        }
-    //        if (Request.QueryString["Website"] != null)
-    //        {
-    //            Website = Request.QueryString["Website"];
-    //        }
-    //        affiliate_id = Request.QueryString["affiliate_id"];
-    //        domain_name = Request.QueryString["domain_name"];
-
-    //        con.Open();
-    //        SqlDataAdapter adp = new SqlDataAdapter("select * from campain_details where campain_id='" + campaign_id + "'", con);
-    //        DataSet ds = new DataSet();
-    //        adp.Fill(ds);
-    //        con.Close();
-    //        if (ds.Tables[0].Rows.Count > 0)
-    //        {
-    //            con.Open();
-    //            SqlDataAdapter adp2 = new SqlDataAdapter("select * from campain_details_Affiliate_wise where campain_id='" + campaign_id + "' and affiliate_id='" + affiliate_id + "' and Website='" + domain_name + "'", con);
-    //            DataSet ds2 = new DataSet();
-    //            adp2.Fill(ds2);
-    //            con.Close();
-    //            if (ds2.Tables[0].Rows.Count > 0)
-    //            {
-    //                string check_running_mode = ds2.Tables[0].Rows[0].ItemArray[6].ToString();
-
-    //                if (check_running_mode == "Running")
-    //                {
-    //                    if (check_running_mode == "Running")
-    //                    {
-    //                        int get_total_clicks = Convert.ToInt32(ds2.Tables[0].Rows[0].ItemArray[3]);
-
-    //                        get_total_clicks = get_total_clicks + 1;
-    //                        decimal Revenue = 0;
-    //                        SqlDataAdapter adp1 = new SqlDataAdapter("select cost from campaigns where campaign_id='" + campaign_id + "' ", con);
-    //                        DataSet ds1 = new DataSet();
-    //                        adp1.Fill(ds1);
-    //                        con.Close();
-    //                        if (ds1.Tables[0].Rows.Count > 0)
-    //                        {
-    //                            string s1 = ds1.Tables[0].Rows[0].ItemArray[0].ToString();
-    //                            if (s1 != "")
-    //                            {
-    //                                decimal d1 = Convert.ToDecimal(s1);
-    //                                Revenue = Convert.ToDecimal(get_total_clicks) * d1;
-    //                            }
-    //                        }
-    //                        con.Open();
-    //                        SqlCommand cmd = new SqlCommand("update campain_details_Affiliate_wise set total_clicks=" + Convert.ToInt32(get_total_clicks) + ",total_conversions=" + Convert.ToInt32(get_total_clicks) + " , total_revenu='" + Revenue + "' where campain_id='" + campaign_id + "' and affiliate_id='" + affiliate_id + "' and Website='" + domain_name + "' ");
-    //                        cmd.Connection = con;
-    //                        int a = cmd.ExecuteNonQuery();
-    //                        con.Close();
-    //                        string event_type1 = "Click";
-    //                        maintain_report(campaign_id, affiliate_id, domain_name, event_type1, get_total_clicks, get_total_clicks, Revenue);
-    //                    }
-    //                }
-    //            }
-    //            string running_status = ds.Tables[0].Rows[0].ItemArray[5].ToString();
-
-
-    //            if (running_status == "Running")
-    //            {
-    //                int get_total_clicks = Convert.ToInt32(ds.Tables[0].Rows[0].ItemArray[2]);
-
-    //                get_total_clicks = get_total_clicks + 1;
-    //                decimal conversion = 0;
-    //                SqlDataAdapter adp1 = new SqlDataAdapter("select cost from campaigns where campaign_id='" + campaign_id + "' ", con);
-    //                DataSet ds1 = new DataSet();
-    //                adp1.Fill(ds1);
-    //                con.Close();
-
-    //                if (ds1.Tables[0].Rows.Count > 0)
-    //                {
-    //                    string s1 = ds1.Tables[0].Rows[0].ItemArray[0].ToString();
-    //                    if (s1 != "")
-    //                    {
-    //                        decimal d1 = Convert.ToDecimal(s1);
-    //                        conversion = Convert.ToDecimal(get_total_clicks) * d1;
-
-    //                    }
-    //                }
-    //                con.Open();
-    //                SqlCommand cmd = new SqlCommand("update campain_details set total_clicks=" + Convert.ToInt32(get_total_clicks) + " , total_conversions=" + Convert.ToInt32(get_total_clicks) + ", total_revenu='" + conversion + "' where campain_id='" + campaign_id + "' ");
-    //                cmd.Connection = con;
-    //                cmd.ExecuteNonQuery();
-    //                cmd.Cancel();
-    //                string sessionID = sid.Value.ToString();
-    //                string str = "insert into getConversion values('" + affiliate_id.ToString().Trim() + "','" + campaign_id.ToString() + "','" + Website + "','" + sessionID + "',0,'')";
-    //                SqlCommand cmdGetConversion = new SqlCommand(str.ToString().Trim());
-    //                cmdGetConversion.Connection = con;
-    //                int InsertStatus = cmdGetConversion.ExecuteNonQuery();
-    //                con.Close();
-    //                string eve_type = "Click";
-    //                maintain_report_admin(campaign_id, eve_type, get_total_clicks, get_total_clicks, conversion);
-
-    //            }
-    //            string event_type = "Click";
-    //            maintain_per_view(campaign_id, affiliate_id, domain_name, event_type, Request.QueryString["os_type"].ToString(), Request.QueryString["Country"].ToString(), sid.Value.ToString());//this function will return nothing
-
-    //            con.Open();
-    //            SqlDataAdapter adp21 = new SqlDataAdapter("select url from campaigns  where campaign_id='" + campaign_id + "' ", con);
-    //            DataSet ds21 = new DataSet();
-    //            adp21.Fill(ds21);
-    //            con.Close();
-    //            if (ds21.Tables[0].Rows.Count > 0)
-    //            {
-    //                if (sid.Value.ToString() != "")
-    //                {
-    //                    string call_on_action = ds21.Tables[0].Rows[0].ItemArray[0].ToString();
-
-    //                }
-    //            }
-    //        }
-    //        else
-    //        {
-
-    //        }
-
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        Response.Write("<script>alert('" + ex.Message.ToString() + "')</script>");
-    //    }
-    //    finally
-    //    {
-    //        string banner_id = Request.QueryString["banner_id"];
-    //        if (banner_id == "Banner 5")
-    //            ScriptManager.RegisterStartupScript(this, this.GetType(), "Warning", "VideoEvent();", true);
-    //    }
-    //}
     protected void maintain_report(string camp_id, string affiliate_id, string domain_name, string event_name, int current_clicks, int current_conversions, decimal current_revenue)
     {
         try
@@ -1696,17 +1520,16 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
 
         }
     }
-
-
-    protected void storeRequestLocation(string camp_id, string affiliate_id, string domain_name, string os_type, string country, string state, string city, string ISP, string lon, string lat) {
+    protected void storeRequestLocation(string eventType, string camp_id, string affiliate_id, string domain_name, string os_type, string country, string state, string city, string ISP, string lon, string lat) {
         try
         {
             if (con.State == ConnectionState.Closed)
                 con.Open();
             string sqlQuery = string.Empty;
-            sqlQuery = "insert into add_request_origions (affiliate_id,campaign_id,country_name,state_name,city_name,OS_type,domain_name,ISP,longitude,latitude,date_time) values(@affiliate_id,@campaign_id,@country_name,@state_name,@city_name,@OS_type,@domain_name,@ISP,@longitude,@latitude,GETDATE())";
+            sqlQuery = "insert into add_request_origions (request_type,affiliate_id,campaign_id,country_name,state_name,city_name,OS_type,domain_name,ISP,longitude,latitude,date_time) values(@request_type,@affiliate_id,@campaign_id,@country_name,@state_name,@city_name,@OS_type,@domain_name,@ISP,@longitude,@latitude,GETDATE())";
             SqlCommand cmd = new SqlCommand(sqlQuery, con);
-            cmd.Parameters.AddWithValue("@affiliate_id",affiliate_id);
+            cmd.Parameters.AddWithValue("@request_type", eventType);
+            cmd.Parameters.AddWithValue("@affiliate_id", affiliate_id);
             cmd.Parameters.AddWithValue("@campaign_id",camp_id);
             cmd.Parameters.AddWithValue("@country_name", country);
             cmd.Parameters.AddWithValue("@state_name",state);
@@ -1724,8 +1547,6 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
         {
         }
     }
-
-
     protected void IncreaseAdRequest(string camp_id, string affiliate_id, string domain_name, string event_name, string OsType, string CountryName, string sid)
     {
         try
