@@ -14,8 +14,8 @@ function initJQuery() {
     } else {
     $(function () {
         AddNo = 1;
-        domain = "http://i.earthinfralanddevelopers.co.in/";
-        //domain = "../";
+        //domain = "http://i.earthinfralanddevelopers.co.in/";
+        domain = "../";
 
         function LoadAd(IsView, EncryptedString, targetElem) {
             var PasteString = CryptoJS.AES.decrypt(EncryptedString, "AUGURS001").toString(CryptoJS.enc.Utf8);

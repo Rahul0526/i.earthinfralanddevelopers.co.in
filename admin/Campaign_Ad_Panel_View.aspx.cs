@@ -209,7 +209,7 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                 else if (banner_id == "Banner 5")
                 {
                     query = "SELECT  [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url],[imageA],[imageB],[imageC],[imageD],[imageE],[animationA],[animationB],[animationC],[animationD],[animationE],[bannerType],[videoPlayBtn] FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + campIdFilter + "' and (country_targeted like '%" + Request.QueryString["country_name"] + "%' OR country_targeted = '') AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery + " ORDER BY NEWID() ";
-                    KeyWordBasedCampId = dlGetKeyWords.MatchedCampaigns(Request.QueryString["domain_name"], banner_id, Request.QueryString["country_name"], Request.QueryString["os_type"], noOfAds, maxConversions);
+                    KeyWordBasedCampId = dlGetKeyWords.MatchedCampaigns(HostedPageUrl, banner_id, Request.QueryString["country_name"], Request.QueryString["os_type"], noOfAds, maxConversions);
                     if (KeyWordBasedCampId != null && KeyWordBasedCampId.Tables[0].Rows.Count > 0)
                     {
                         ds = KeyWordBasedCampId;
@@ -258,7 +258,7 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
 
                         query = "SELECT  [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url],[ShowCallToAction]," + todaysConversions + " FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + campIdFilter + "' and (country_targeted like '%" + Request.QueryString["country_name"] + "%' OR country_targeted = '') AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery + " ORDER BY NEWID() ";
 
-                        KeyWordBasedCampId = dlGetKeyWords.MatchedCampaigns(Request.QueryString["domain_name"], banner_id, Request.QueryString["country_name"], Request.QueryString["os_type"], noOfAds, maxConversions);
+                        KeyWordBasedCampId = dlGetKeyWords.MatchedCampaigns(HostedPageUrl, banner_id, Request.QueryString["country_name"], Request.QueryString["os_type"], noOfAds, maxConversions);
                         if (KeyWordBasedCampId != null && KeyWordBasedCampId.Tables[0].Rows.Count > 0)
                         {
                             ds = KeyWordBasedCampId;

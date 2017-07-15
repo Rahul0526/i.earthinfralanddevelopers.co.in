@@ -27,7 +27,8 @@ public class DALGetKeyWords
                 #region Get keywords from web page
 
                 #region Setting page Url
-                pageUrl = "http://news.nationalgeographic.com/2017/04/jungle-dogs-peru-amazon-rare";
+                // pageUrl = "http://news.nationalgeographic.com/2017/04/jungle-dogs-peru-amazon-rare";
+                // pageUrl = "http://camp.earthinfralanddevelopers.co.in/test/test.html";
                 #endregion
 
                 string Apikey = "4a5075dbb713f58f60e3acf8f924fa41c9555287";                                   //"e9370cd124274b2dcd0cc7735ad912eb6be52f79";
