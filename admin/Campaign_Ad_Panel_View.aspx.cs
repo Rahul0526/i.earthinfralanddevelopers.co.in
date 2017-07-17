@@ -1768,7 +1768,7 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                             }
                             //MainImageURL = "http://camp.earthinfralanddevelopers.co.in/Campaign_Images/" + MainImgImageName.ToString();
                         }
-                        sbBanner1.Append("<div  id='" + dspage.Tables[0].Rows[countLoop].ItemArray[0].ToString() + "' class='item pointer' style=' background-color : #" + HttpContext.Current.Session["AdbgColor"].ToString() + " ; border: thin solid # " + HttpContext.Current.Session["Banner2BorderColor"].ToString() + " ; '  onclick='clicked(this)'>");
+                        sbBanner1.Append("<div  id='" + dspage.Tables[0].Rows[countLoop].ItemArray[0].ToString() + "' class='item' style=' background-color : #" + HttpContext.Current.Session["AdbgColor"].ToString() + " ; border: thin solid # " + HttpContext.Current.Session["Banner2BorderColor"].ToString() + " ; '  onclick='clicked(this)'>");
                         sbBanner1.Append("<div id='banner1' class='card' runat='server' style='border: solid 3px #CCC4C4;'>");
                         sbBanner1.Append("<div class='card'    >");
                         sbBanner1.Append("<div class='title-container'>");
@@ -1867,10 +1867,11 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                         sbBanner1.Append("<div class='clearfix'></div>");
                         sbBanner1.Append("</div>");
 
-                        sbBanner1.Append("<a href='" + dspage.Tables[0].Rows[countLoop].ItemArray[4].ToString() + ClickId + "' runat='server' target='_parent' id='button_anchor_tag'  style='text-decoration: none;' onclick='callBan1(this)'><div class='card-description' style='min-height: 115px; margin-left: 5px; color:#" + HttpContext.Current.Session["DescriptionColor"].ToString() + "'><div>");
+                        sbBanner1.Append("<a href='" + dspage.Tables[0].Rows[countLoop].ItemArray[4].ToString() + ClickId + "' runat='server' target='_parent' id='button_anchor_tag'  style='text-decoration: none;' onclick='callBan1(this)'><div class='card-description' style='height: 137px; margin-left: 5px; color:#" + HttpContext.Current.Session["DescriptionColor"].ToString() + "'><div>");
                         sbBanner1.Append(strDescription);
                         sbBanner1.Append("</div></div></a>");
                         sbBanner1.Append("<div class='card-banner'>");
+                        sbBanner1.Append("<span style=\"background-image: url('" + MainImageURL.ToString() + "')\" class='blurred-bg'></span>");
                         sbBanner1.Append("<img src='" + MainImageURL.ToString() + "' runat='server' id='banner_img_banner1' alt='banner-img'  class='img-responsive' style=' width:100%;'/>");
                         sbBanner1.Append(" </div>");
                         sbBanner1.Append("<div id='camp_id_banner1'  runat='server' style='font-size: 0pt'> " + dspage.Tables[0].Rows[countLoop].ItemArray[0].ToString() + " </div>");

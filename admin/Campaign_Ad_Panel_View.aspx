@@ -1,7 +1,7 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Campaign_Ad_Panel_View.aspx.cs"
 	EnableEventValidation="false" Inherits="Campaign_Ad_Panel_View" %>
 
-<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
+<%--<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>--%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head id="Head1" runat="server">
@@ -31,6 +31,19 @@
 			top: 0;
 			left: 0;
 		}*/
+        
+        .blurred-bg {
+	        position: absolute;
+	        width: 120%;
+	        height: 100%;
+	        top: 0%;
+	        left: -10%;
+	        opacity: 0.4;
+	        filter: blur(10px);
+	        background-repeat: no-repeat;
+	        background-size: cover;
+	        background-position: center;
+        }
 		.pointer {cursor: pointer;}
 		.hiddenBtn { display:none;}
 		.overlay {position: relative; z-index: 999999999;}
@@ -415,8 +428,8 @@
 			document.getElementById('sliderBanner1').innerHTML = document.getElementById('hdnfBanner1Code').value;
 		}
 	</script>
-	<asp:UpdatePanel runat="server" ID="AdSection">
-		<ContentTemplate>
+	<%--<asp:UpdatePanel runat="server" ID="AdSection">
+		<ContentTemplate>--%>
 			<%--  id="AdPageBody" runat="server"--%>
 			<asp:HiddenField ID="hdnfClickId" Value="0" runat="server" />
 			<asp:HiddenField ID="HiddenViewCount" Value="0" runat="server" />
@@ -455,6 +468,7 @@
 						display: inline-block;
 						float: left;
 						width: 100%;
+                        overflow: hidden;
 					}
 					.owl-item .title-container
 					{
@@ -1047,8 +1061,8 @@
 				}*/
 			</script>
 			</div>
-		</ContentTemplate>
-	</asp:UpdatePanel>
+		<%--</ContentTemplate>
+	</asp:UpdatePanel>--%>
 	</form>
 	<script type="text/javascript">
 		$(document).ready(function () {
