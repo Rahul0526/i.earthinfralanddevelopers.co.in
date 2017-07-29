@@ -98,12 +98,15 @@ function initJQuery() {
                         lat = data['latitude'];
                         isp = data['isp'].split(' ')[0];
                         if (1 == 1) {
-                            var url = domain + "Admin/Campaign_Ad_Panel_View.aspx?camp_id=0&sid=&request_type=" + req_type + "&affiliate_id=" + Affiliate_id + "&domain_name=" + domain_name + "&bg_color=" + bg_color + "&button_color=" + button_color + "&banner_id=" + banner_id + "&os_type=" + os_type + "&country_name=" + country + "&isp=" + isp + "&View=0&AdToLoad=" + AdToLoad + "&NoOfBanner1=" + total_banner1 + "&Banner2BorderColor=" + Banner2BorderColor + "&banner2TextColor=" + Banner2textColor + "&AdPageUrl=" + AdPageUrl + "&Country=" + country + "&TitleColor=" + TitleColor + "&DescriptionColor=" + DescriptionColor + "&BorderColor=" + BorderColor + "&PageBackColor=" + PageBackColor + "&ShowCallToAct=" + ShowCallToAct + "&showImage=" + showImage + "&PassBackId=" + PassBackId + "&width=" + $('#DivControl').parent().width();
+                            var url = domain + "Admin/Campaign_Ad_Panel_View.aspx?camp_id=0&sid=&request_type=" + req_type + "&affiliate_id=" + Affiliate_id + "&domain_name=" + domain_name + "&bg_color=" + bg_color + "&button_color=" + button_color + "&banner_id=" + banner_id + "&os_type=" + os_type + "&country_name=" + country + "&isp=" + isp + "&View=0&AdToLoad=" + AdToLoad + "&NoOfBanner1=" + total_banner1 + "&Banner2BorderColor=" + Banner2BorderColor + "&banner2TextColor=" + Banner2textColor + "&AdPageUrl=" + AdPageUrl + "&Country=" + country + "&state_name=" + state + "&city_name=" + city + "&lon=" + lon + "&lat=" + lat + "&TitleColor=" + TitleColor + "&DescriptionColor=" + DescriptionColor + "&BorderColor=" + BorderColor + "&PageBackColor=" + PageBackColor + "&ShowCallToAct=" + ShowCallToAct + "&showImage=" + showImage + "&PassBackId=" + PassBackId + "&width=" + $('#DivControl').parent().width();
+                            alert(url);
                             $.ajax({
                                 url: url,
                                 success: function (response) {
                                     $arr = response.split("<!");
                                     result = $.trim($arr[0]);
+                                    //alert(result);
+                                    //alert(url);
                                     if (!(result.indexOf('alert(') >= 0)) {
                                         var url1 = "";
                                         if (result != "" || banner_id == "Banner 1" || banner_id == "Banner 4") {
@@ -111,7 +114,7 @@ function initJQuery() {
                                                 if (IsView != 0) {
                                                     url1 = domain + "Admin/Campaign_Ad_Panel_View.aspx?camp_id=" + result + "&request_type=" + req_type + "&affiliate_id=" + Affiliate_id + "&domain_name=" + domain_name + "&bg_color=" + bg_color + "&button_color=" + button_color + "&banner_id=" + banner_id + "&os_type=" + os_type + "&country_name=" + country + "&state_name=" + state + "&city_name=" + city + "&lon=" + lon + "&lat=" + lat + "&isp=" + isp + "&View=" + IsView + "&AdToLoad=" + AdToLoad + "&NoOfBanner1=" + total_banner1 + "&Banner2BorderColor=" + Banner2BorderColor + "&banner2TextColor=" + Banner2textColor + "&AdPageUrl=" + AdPageUrl + "&Country=" + country + "&TitleColor=" + TitleColor + "&DescriptionColor=" + DescriptionColor + "&BorderColor=" + BorderColor + "&PageBackColor=" + PageBackColor + "&ShowCallToAct=" + ShowCallToAct + "&showImage=" + showImage + "&PassBackId=" + PassBackId;
                                                 }
-                                                ifrm = '<iframe frameborder="0" id="my_frame" data-frame-id="' + AddNo + '" data-view="' + IsView + '" class="frame" style="width: 300px; height: 510px; margin-top: -25px;" src="' + url1 + '" scrolling="no" data-campId="' + result + '" data-bannerId="' + banner_id + '" data-affiliateId="' + Affiliate_id + '" data-domain="' + domain_name + '" data-os="' + os_type + '" data-country="' + country + '"></iframe>';
+                                                ifrm = '<iframe frameborder="0" id="my_frame" data-frame-id="' + AddNo + '" data-view="' + IsView + '" height="0" class="frame" style="width: 300px; margin-top: -25px;" src="' + url1 + '" scrolling="no" data-campId="' + result + '" data-bannerId="' + banner_id + '" data-affiliateId="' + Affiliate_id + '" data-domain="' + domain_name + '" data-os="' + os_type + '" data-country="' + country + '"></iframe>';
                                                 targetElem.after(ifrm);
                                             } else {
                                                 if (IsView != 0) {
@@ -203,7 +206,7 @@ function initJQuery() {
                 $("[id=my_frame]").each(function () {
                     if (parseInt($(this).attr('data-view')) == 2) {
                         if ($(this).isOnScreen(0.5, 0.5) == true) {
-                            $(this).attr('data-view', 1);
+                            iframe = $(this);
                             campId = $(this).attr('data-campId');
                             bannerId = $(this).attr('data-bannerId');
                             affiliateId = $(this).attr('data-affiliateId');
@@ -219,8 +222,16 @@ function initJQuery() {
                                 data: parameter,
                                 contentType: 'application/json; charset=utf-8',
                                 dataType: 'json',
+                                beforeSend: function () {
+                                    //alert(parameter);
+                                    iframe.attr('data-view', 3);
+                                },
+                                success: function (data) {
+                                    iframe.attr('data-view', 1);
+                                },
                                 error: function (data, success, error) {
-                                    // alert("Opps... Someting went wrong. Please contact IT Team." + error);
+                                    iframe.attr('data-view', 2);
+                                     //alert("Opps... Someting went wrong. Please contact IT Team." + error);
                                 }
                             });
                         } else {
@@ -916,7 +927,7 @@ function iframeLoaded(elem) {
 }
 
 function receiveSize(e) {
-    if (e.origin === "http://i.earthinfralanddevelopers.co.in") {
+    if (e.origin === "http://i.earthinfralanddevelopers.co.in" || e.origin == "http://localhost:49865") {
         var newHeight = e.data + 35;
         document.getElementById("my_frame").style.height = e.data + "px";
     }

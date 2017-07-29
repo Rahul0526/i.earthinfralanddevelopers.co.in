@@ -46,10 +46,6 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
     {
         try
         {
-            if (string.IsNullOrEmpty(Request.QueryString["width"]))
-            {
-
-            }
             if (!Page.IsPostBack)
             {
                 Session["sid"] = RandomString(24);
@@ -73,7 +69,12 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                     HiddenVideoCount.Value = ViewState["VidCount"].ToString();
                     if (Request.QueryString["banner_id"] == "Banner 1" || Request.QueryString["banner_id"] == "Banner 4")
                     {
-                        this.load_data_banner();
+                        // this.load_data_banner();
+                        randomcampid.InnerHtml = load_ad_copy();
+                        if (Request.QueryString["View"].ToString() == "0")
+                        {
+                            Response.Write(randomcampid.InnerHtml);
+                        }
                         Session.Add("DescriptionColor", Request.QueryString["DescriptionColor"].ToString());
                         Session.Add("TitleColor", Request.QueryString["TitleColor"].ToString());
                         Session.Add("NoOfBanners", Request.QueryString["NoOfBanner1"].ToString());
@@ -114,8 +115,8 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
 
                             #endregion
                         }
-                        else
-                            this.load_data_banner();
+                        //else
+                        //    this.load_data_banner();
                     }
                 }
                 else
@@ -145,120 +146,170 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
         backToStart:
 
             //System.IO.Directory.CreateDirectory(domain + "Campaign_Images/image_catche");
-            string CookieBannerType = "";
-            string[] campArr = new string[10];
             string banner_id = Request.QueryString["banner_id"];
-            #region ReadCookies
-            string ComputerId = this.ReadCookies();
-            if (ComputerId != string.Empty)
-                campArr = _dlValidateTags.SetCookiePriority(ComputerId, banner_id);
-            #endregion
             int noOfAds = Convert.ToInt32(Request.QueryString["NoOfBanner1"]);
+            string country = Request.QueryString["country_name"].ToString().Trim();
+            string city = Request.QueryString["city_name"].ToString().Trim();
+            string isp = Request.QueryString["isp"].ToString().Trim();
+            string osType = Request.QueryString["os_type"].ToString().Trim();
             string query = string.Empty;
             string campign_id = string.Empty;
             string campIdFilter = "";
-            bool checkConversions = true;
-            string todaysConversions = "(SELECT count(AffiliateId) FROM getConversion as gCon JOIN view_click_maintain_on_daily_base as clicks ON gCon.Clickid = clicks.ClickId WHERE gCon.campaignId =campaigns.campaign_id AND [date]=CAST(GETDATE() AS DATE)) as ConversionsDoneToday";
-            string LimitConversionsInQuery = "(campaigns.dailyCapping IS NULL OR campaigns.dailyCapping = 0 OR (campaigns.dailyCapping IS not null AND campaigns.dailyCapping > (SELECT count(AffiliateId) FROM getConversion as gCon JOIN view_click_maintain_on_daily_base as clicks ON gCon.Clickid = clicks.ClickId WHERE gCon.campaignId = campaigns.campaign_id AND [date]=CAST(GETDATE() AS DATE))))";
+            string matchOrder = string.Empty;
+            
+            string todaysConversions = "(SELECT count(AffiliateId) FROM getConversion as gCon JOIN view_click_maintain_on_daily_base as clicks ON gCon.Clickid = clicks.ClickId WHERE gCon.campaignId =campaigns.campaign_id AND [date]=CAST(GETDATE() AS DATE))";
             DataSet ds = new DataSet();
             string HostedPageUrl = Request.QueryString["AdPageUrl"];
             if (Request.QueryString["camp_id"].ToString() != "undefined" && Request.QueryString["camp_id"].ToString() != "0")
             {
-                campign_id = Request.QueryString["camp_id"].ToString();
-                campIdFilter = "' and campaign_id='" + campign_id;
-                con.Open();
-                string checkClicksCountQuery = "SELECT dailyCapping, ( SELECT count(AffiliateId) FROM getConversion as gCon JOIN view_click_maintain_on_daily_base as clicks ON gCon.Clickid = clicks.ClickId WHERE gCon.campaignId = campaigns.campaign_id AND [date]=CAST(GETDATE() AS DATE)) AS conversions FROM campaigns WHERE campaign_id='" + campign_id + "'";
-                SqlCommand chkClick = new SqlCommand(checkClicksCountQuery);
-                chkClick.Connection = con;
-                SqlDataReader reader = chkClick.ExecuteReader();
-                reader.Read();
-                int conversions = 0;
-                int capping = 0;
-                bool checkConversion = false;
-                if (reader.HasRows)
+                campign_id = Request.QueryString["camp_id"].ToString().Trim();
+                if (campign_id != "")
                 {
-                    if (!reader.IsDBNull(0))
+                    randomcampid.InnerHtml = campign_id;
+                    string[] campIds = campign_id.Split(',');
+                    if (campIds.Length > 1)
                     {
-                        checkConversion = true;
-                        conversions = reader.GetInt32(1);
-                        capping = (int)reader.GetDecimal(0);
+                        campIdFilter += " and (";
+                        for (int i = 0; i < campIds.Length; i++)
+                        {
+                            campIdFilter += i == 0 ? "campaign_id='" + campIds[i] + "'" : " OR campaign_id='" + campIds[i] + "'";
+                        }
+                        campIdFilter += ")";
                     }
-                }
-                reader.Close();
-                con.Close();
-                if (checkConversion && capping != 0 && conversions >= capping) {
+                    else
+                    {
+                        campIdFilter = " and campaign_id='" + campign_id + "' ";
+                    }
+                    //con.Open();
+                    //string checkClicksCountQuery = "SELECT dailyCapping, ( SELECT count(AffiliateId) FROM getConversion as gCon JOIN view_click_maintain_on_daily_base as clicks ON gCon.Clickid = clicks.ClickId WHERE gCon.campaignId = campaigns.campaign_id AND [date]=CAST(GETDATE() AS DATE)) AS conversions FROM campaigns WHERE campaign_id='" + campign_id + "'";
+                    //SqlCommand chkClick = new SqlCommand(checkClicksCountQuery);
+                    //chkClick.Connection = con;
+                    //SqlDataReader reader = chkClick.ExecuteReader();
+                    //reader.Read();
+                    //int conversions = 0;
+                    //int capping = 0;
+                    //bool checkConversion = false;
+                    //if (reader.HasRows)
+                    //{
+                    //    if (!reader.IsDBNull(0))
+                    //    {
+                    //        checkConversion = true;
+                    //        conversions = reader.GetInt32(1);
+                    //        capping = (int)reader.GetDecimal(0);
+                    //    }
+                    //}
+                    //reader.Close();
+                    //con.Close();
+                    //if (checkConversion && capping != 0 && conversions >= capping)
+                    //{
+                    //    return "";
+                    //}
+                    query = "SELECT [campaign_id],[campaigin_name],[title],[discription],[url],[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url],[ShowCallToAction]," + todaysConversions + " as ConversionsDoneToday FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + "' " + campIdFilter + " ORDER BY NEWID() ";
+                    this.load_data_banner();
+                } else
+                {
                     return "";
                 }
             }
-                
-            #region Banner Keywords section
-            try
+            else
             {
-                if (banner_id == "Banner 1" || banner_id == "Banner 4")
+                #region Setting Query Parameters
+                #region ReadCookies
+                string CookieBannerType = "";
+                string[] campArr = new string[] { };
+                string ComputerId = this.ReadCookies();
+                if (ComputerId != string.Empty)
+                    campArr = _dlValidateTags.SetCookiePriority(ComputerId, banner_id);
+                #endregion
+                string CountryTargettingFilter = string.Empty;
+                if (country != "")
                 {
-                    //another ad from here. we got 
-                    query = "select top(" + noOfAds + ") [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url]  FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + "' and (country_targeted like '%" + Request.QueryString["country_name"] + "%' OR country_targeted = '') AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' ORDER BY NEWID() ";
-                    KeyWordBasedCampId = dlGetKeyWords.MatchedCampaigns(HostedPageUrl, banner_id, Request.QueryString["country_name"], Request.QueryString["os_type"], noOfAds, maxConversions);
-
-                    dspage = _dlPriorityList.GetPriorityCampaignList(Request.QueryString["AdPageUrl"], banner_id, Request.QueryString["country_name"], Request.QueryString["os_type"], noOfAds, KeyWordBasedCampId, campArr, ComputerId, LimitConversionsInQuery);
-                    //dspage = KeyWordBasedCampId;                                   
-                    ds = dspage;
-                    checkConversions = false;
-                    goto KeySucceded;
-                }
-                else if (banner_id == "Banner 5")
-                {
-                    query = "SELECT  [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url],[imageA],[imageB],[imageC],[imageD],[imageE],[animationA],[animationB],[animationC],[animationD],[animationE],[bannerType],[videoPlayBtn] FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + campIdFilter + "' and (country_targeted like '%" + Request.QueryString["country_name"] + "%' OR country_targeted = '') AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery + " ORDER BY NEWID() ";
-                    KeyWordBasedCampId = dlGetKeyWords.MatchedCampaigns(HostedPageUrl, banner_id, Request.QueryString["country_name"], Request.QueryString["os_type"], noOfAds, maxConversions);
-                    if (KeyWordBasedCampId != null && KeyWordBasedCampId.Tables[0].Rows.Count > 0)
-                    {
-                        ds = KeyWordBasedCampId;
-                        dspage = KeyWordBasedCampId;
-                        goto KeySucceded;
-                    }
-                    else
-                        goto Keyfailed;
+                    matchOrder = string.Format("(len(country_targeted) - len(replace(country_targeted, '{0}', '')))/{1}", country, country.Length);
+                    CountryTargettingFilter = string.Format("(country_targeted like '%{0}%' OR country_targeted = '' OR country_targeted IS NULL)", country);
                 }
                 else
                 {
-                    string CookieCampId = "";
-                    for (int Count = 0; Count < campArr.Length; Count++)
-                    {
-                        if (campArr[Count] != null)
-                        {
-                            if (campArr[Count] != "InvalidCampaign")
-                            {
-                                CookieCampId = campArr[Count].ToString();
+                    CountryTargettingFilter = "(country_targeted = '' OR country_targeted IS NULL)";
+                }
 
-                                CookieBannerType = GetCookieBannerType(CookieCampId);
-                                if (banner_id == CookieBannerType)
-                                {
-                                    this.insertCookieTagImpression(ComputerId, CookieCampId);
-                                    break;
-                                }
-                                else
-                                {
-                                    CookieCampId = string.Empty;
-                                    continue;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                    if (CookieCampId != string.Empty)
+                string cityTargettingFilter = string.Empty;
+                if (city != "")
+                {
+                    if (matchOrder != string.Empty)
                     {
-                        query = "SELECT  [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url],[ShowCallToAction]," + todaysConversions + " FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + campIdFilter + "' and campaign_id='" + CookieCampId + "' and (country_targeted like '%" + Request.QueryString["country_name"] + "%' OR country_targeted = '') AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery + " ORDER BY NEWID() ";
-
+                        matchOrder += string.Format(" + (len(CityTargeted) - len(replace(CityTargeted, '{0}', '')))/{1}", city, city.Length);
                     }
                     else
                     {
+                        matchOrder = string.Format("(len(CityTargeted) - len(replace(CityTargeted, '{0}', '')))/{1}", city, city.Length);
+                    }
+                    cityTargettingFilter = "(CityTargeted like '%" + city + "%' OR CityTargeted = '' OR CityTargeted IS NULL)";
+                }
+                else
+                {
+                    cityTargettingFilter = "(CityTargeted = '' OR CityTargeted IS NULL)";
+                }
 
-                        query = "SELECT  [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url],[ShowCallToAction]," + todaysConversions + " FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + campIdFilter + "' and (country_targeted like '%" + Request.QueryString["country_name"] + "%' OR country_targeted = '') AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery + " ORDER BY NEWID() ";
+                string ispTargettingFilter = string.Empty;
+                if (isp != "")
+                {
+                    if (matchOrder != string.Empty)
+                    {
+                        matchOrder += string.Format(" + (len(ISPTargeted) - len(replace(ISPTargeted, '{0}', '')))/{1}", isp, isp.Length);
+                    }
+                    else
+                    {
+                        matchOrder = string.Format("(len(ISPTargeted) - len(replace(ISPTargeted, '{0}', '')))/{1}", isp, isp.Length);
+                    }
+                    ispTargettingFilter = "(ISPTargeted like '%" + isp + "%' OR ISPTargeted = '' OR ISPTargeted IS NULL)";
+                }
+                else
+                {
+                    ispTargettingFilter = "(ISPTargeted = '' OR ISPTargeted IS NULL)";
+                }
 
-                        KeyWordBasedCampId = dlGetKeyWords.MatchedCampaigns(HostedPageUrl, banner_id, Request.QueryString["country_name"], Request.QueryString["os_type"], noOfAds, maxConversions);
+                string osTargettingFilter = string.Empty;
+                if (isp != "")
+                {
+                    if (matchOrder != string.Empty)
+                    {
+                        matchOrder += string.Format(" + (len(device_and_action) - len(replace(device_and_action, '{0}', '')))/{1}", osType, osType.Length);
+                    }
+                    else
+                    {
+                        matchOrder = string.Format("(len(device_and_action) - len(replace(device_and_action, '{0}', '')))/{0}", osType, osType.Length);
+                    }
+                    osTargettingFilter = "(device_and_action like '%" + osType + "%' OR device_and_action = '' OR device_and_action IS NULL)";
+                }
+                else
+                {
+                    osTargettingFilter = "(device_and_action = '' OR device_and_action IS NULL)";
+                }
+
+                string targettingFilter = string.Format("{0} AND {1} AND {2} AND {3}", CountryTargettingFilter, cityTargettingFilter, ispTargettingFilter, osTargettingFilter);
+                string LimitConversionsInQuery = "(campaigns.dailyCapping IS NULL OR campaigns.dailyCapping = 0 OR (campaigns.dailyCapping IS not null AND campaigns.dailyCapping > (SELECT count(AffiliateId) FROM getConversion as gCon JOIN view_click_maintain_on_daily_base as clicks ON gCon.Clickid = clicks.ClickId WHERE gCon.campaignId = campaigns.campaign_id AND [date]=CAST(GETDATE() AS DATE))))";
+                #endregion
+
+                #region Banner Keywords section
+                try
+                {
+
+                    if (banner_id == "Banner 1" || banner_id == "Banner 4")
+                    {
+                        //another ad from here. we got 
+                        query = "select top(" + noOfAds + ") [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url]  FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + "' and " + CountryTargettingFilter + " AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' ORDER BY NEWID() ";
+                        KeyWordBasedCampId = dlGetKeyWords.MatchedCampaigns(HostedPageUrl, banner_id, Request.QueryString["country_name"], Request.QueryString["os_type"], noOfAds, maxConversions, todaysConversions, matchOrder, targettingFilter, LimitConversionsInQuery);
+
+                        dspage = _dlPriorityList.GetPriorityCampaignList(Request.QueryString["AdPageUrl"], banner_id, Request.QueryString["country_name"], Request.QueryString["os_type"], noOfAds, KeyWordBasedCampId, campArr, ComputerId, LimitConversionsInQuery);
+                        //dspage = KeyWordBasedCampId;                                   
+                        ds = dspage;
+                        goto KeySucceded;
+                    }
+                    else if (banner_id == "Banner 5")
+                    {
+                        noOfAds = 1;
+                        query = "SELECT  [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url],[imageA],[imageB],[imageC],[imageD],[imageE],[animationA],[animationB],[animationC],[animationD],[animationE],[bannerType],[videoPlayBtn] FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + "' " + campIdFilter + " and " + CountryTargettingFilter + " AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery + " ORDER BY NEWID() ";
+                        KeyWordBasedCampId = dlGetKeyWords.MatchedCampaigns(HostedPageUrl, banner_id, Request.QueryString["country_name"], Request.QueryString["os_type"], noOfAds, maxConversions, todaysConversions, matchOrder, targettingFilter, LimitConversionsInQuery);
                         if (KeyWordBasedCampId != null && KeyWordBasedCampId.Tables[0].Rows.Count > 0)
                         {
                             ds = KeyWordBasedCampId;
@@ -266,49 +317,97 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                             goto KeySucceded;
                         }
                         else
-                        {
                             goto Keyfailed;
+                    }
+                    else
+                    {
+                        string CookieCampId = "";
+                        for (int Count = 0; Count < campArr.Length; Count++)
+                        {
+                            if (campArr[Count] != null)
+                            {
+                                if (campArr[Count] != "InvalidCampaign")
+                                {
+                                    CookieCampId = campArr[Count].ToString();
+
+                                    CookieBannerType = GetCookieBannerType(CookieCampId);
+                                    if (banner_id == CookieBannerType)
+                                    {
+                                        this.insertCookieTagImpression(ComputerId, CookieCampId);
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        CookieCampId = string.Empty;
+                                        continue;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        if (CookieCampId != string.Empty)
+                        {
+                            query = "SELECT  [campaign_id],[campaigin_name],[title],[discription],[url],[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url],[ShowCallToAction]," + todaysConversions + " as ConversionsDoneToday FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + "' " + campIdFilter + " and campaign_id='" + CookieCampId + "' and " + CountryTargettingFilter + " AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery + " ORDER BY NEWID() ";
+
+                        }
+                        else
+                        {
+                            query = "SELECT [campaign_id],[campaigin_name],[title],[discription],[url],[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url],[ShowCallToAction]," + todaysConversions + " as ConversionsDoneToday, (" + matchOrder + ") as [customOrder] FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + "' " + campIdFilter + " AND " + targettingFilter + " AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery + " ORDER BY [customOrder] DESC, NEWID()";
+                            //noOfAds = 1;
+                            KeyWordBasedCampId = dlGetKeyWords.MatchedCampaigns(HostedPageUrl, banner_id, Request.QueryString["country_name"], Request.QueryString["os_type"], noOfAds, maxConversions, todaysConversions, matchOrder, targettingFilter, LimitConversionsInQuery);
+                            if (KeyWordBasedCampId != null && KeyWordBasedCampId.Tables[0].Rows.Count > 0)
+                            {
+                                ds = KeyWordBasedCampId;
+                                dspage = KeyWordBasedCampId;
+                                goto KeySucceded;
+                            }
+                            else
+                            {
+                                goto Keyfailed;
+                            }
                         }
                     }
                 }
-            }
-            catch
-            {
-                string CookieCampId = "";
-
-                for (int Count = 0; Count < campArr.Length; Count++)
+                catch (Exception ex)
                 {
-                    CookieCampId = campArr[Count].ToString();
-                    CookieBannerType = GetCookieBannerType(CookieCampId);
-                    if (banner_id == CookieBannerType)
-                    {
-                        this.insertCookieTagImpression(ComputerId, CookieCampId);
-                        break;
-                    }
-                    else
-                        continue;
-                }
+                    string CookieCampId = "";
 
-                if (CookieCampId != string.Empty)
-                    query = "SELECT  [campaign_id],[campaigin_name],[title],[discription],[url],[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url],[ShowCallToAction]," + todaysConversions + " FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + campIdFilter + "' and campaign_id='" + Request.QueryString["CookieCampId"].ToString() + "' and country_targeted like '%" + Request.QueryString["country_name"] + "%' AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery + " ORDER BY NEWID() ";
-                else
-                    query = "SELECT  [campaign_id],[campaigin_name],[title],[discription],[url],[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url],[ShowCallToAction]," + todaysConversions + " FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + campIdFilter + "' and country_targeted like '%" + Request.QueryString["country_name"] + "%' AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery + " ORDER BY NEWID() ";
+                    for (int Count = 0; Count < campArr.Length; Count++)
+                    {
+                        CookieCampId = campArr[Count].ToString();
+                        CookieBannerType = GetCookieBannerType(CookieCampId);
+                        if (banner_id == CookieBannerType)
+                        {
+                            this.insertCookieTagImpression(ComputerId, CookieCampId);
+                            break;
+                        }
+                        else
+                            continue;
+                    }
+
+                    if (CookieCampId != string.Empty)
+                        query = "SELECT [campaign_id],[campaigin_name],[title],[discription],[url],[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url],[ShowCallToAction]," + todaysConversions + " as ConversionsDoneToday FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + "' " + campIdFilter + " and campaign_id='" + Request.QueryString["CookieCampId"].ToString() + "' and " + CountryTargettingFilter + " AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery + " ORDER BY NEWID() ";
+                    else
+                        query = "SELECT [campaign_id],[campaigin_name],[title],[discription],[url],[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url],[ShowCallToAction]," + todaysConversions + " as ConversionsDoneToday FROM [dbo].[campaigns]  where Add_style_formate='" + banner_id + "' and " + CountryTargettingFilter + " AND (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery + " ORDER BY NEWID() ";
+                }
+                #endregion
             }
-            #endregion
 
             #region Keywords Response section
-        Keyfailed:
-            #region Optional Query Part
-            con.Open();
-            SqlDataAdapter adp = new SqlDataAdapter(query, con);
-            ds.Clear();
-            adp.Fill(ds);
-            con.Close();
-            dspage = ds;
+            Keyfailed:
+                #region Optional Query Part
+                con.Open();
+                SqlDataAdapter adp = new SqlDataAdapter(query, con);
+                ds.Clear();
+                adp.Fill(ds);
+                con.Close();
+                dspage = ds;
             #endregion
-        KeySucceded:
-            
-        if (ds.Tables[0].Rows.Count > 0)
+            KeySucceded:
+            if (ds.Tables[0].Rows.Count > 0)
             {
                 string os_ = ds.Tables[0].Rows[0].ItemArray[7].ToString();
                 string _ClientSystemOs = Request.QueryString["os_type"];
@@ -335,8 +434,8 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                     else
                         goto backToStart;
                 }
-            #endregion
                 Session.Add("dspage", dspage);
+
                 #region Add Session Details
                 Session.Add("bnrID", banner_id.ToString());
                 Session.Add("UserWebsite", Request.QueryString["domain_name"].ToString());
@@ -346,307 +445,327 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                 Session.Add("CountryName", Request.QueryString["Country"].ToString());
                 #endregion
 
-
-                if (ds.Tables[0].Rows.Count > 0)
+                if (banner_id == "Banner 1" || banner_id == "Banner 4")
+                {
+                    for (int count = 0; count < ds.Tables[0].Rows.Count; count++)
+                    {
+                        campign_id += campign_id == "" ? ds.Tables[0].Rows[count].ItemArray[0].ToString() : "," + ds.Tables[0].Rows[count].ItemArray[0].ToString();
+                    }
+                }
+                else
                 {
                     campign_id = ds.Tables[0].Rows[0].ItemArray[0].ToString();
-                    data_campain_id.InnerText = campign_id;
-                    data_bannerId.InnerText = Request.QueryString["banner_id"].ToString();
-                    data_domain_name.InnerText = Request.QueryString["domain_name"].ToString();
-                    data_affiliatedId.InnerText = Request.QueryString["affiliate_id"].ToString();
-                    data_os_type.InnerText = Request.QueryString["os_type"].ToString();
-                    data_country_name.InnerText = Request.QueryString["country_name"].ToString();
-                    //campign_id = "Ap1017012726092";
+                }
+                data_campain_id.InnerText = campign_id;
+                data_bannerId.InnerText = Request.QueryString["banner_id"].ToString();
+                data_domain_name.InnerText = Request.QueryString["domain_name"].ToString();
+                data_affiliatedId.InnerText = Request.QueryString["affiliate_id"].ToString();
+                data_os_type.InnerText = Request.QueryString["os_type"].ToString();
+                data_country_name.InnerText = Request.QueryString["country_name"].ToString();
+                //campign_id = "Ap1017012726092";
 
-                    #region assembling Sponsered / Adv
-                    string sponsered_or_adv = ds.Tables[0].Rows[0].ItemArray[10].ToString();
-                    if (sponsered_or_adv == "Sponsored" || sponsered_or_adv == "sponsored")
+                #region assembling Sponsered / Adv
+                string sponsered_or_adv = ds.Tables[0].Rows[0].ItemArray[10].ToString();
+                if (sponsered_or_adv == "Sponsored" || sponsered_or_adv == "sponsored")
+                {
+                    //sponsore_banner2.InnerHtml = "Sponsored <span href=\"#\" class=\"fa fa-info-circle\" data-toggle=\"popover\" title=\"Message\" data-html=\"true\" data-placement=\"right\" data-content=\"<a href='http://google.com' target='_blank' >Click here to opt out</a>\"></span>";
+                    sponsore_banner2.InnerHtml = "Sponsored";
+
+                    sponsers_banner4.InnerHtml = "Sponsored <span href=\"#\" class=\"fa fa-info-circle\" data-toggle=\"popover\" title=\"Message\" data-html=\"true\" data-placement=\"left\" data-content=\"<a href='http://google.com' target='_blank' >Click here to opt out</a>\"></span>";
+                    sponserese_banner_5.InnerHtml = "Sponsored <span href=\"#\" class=\"fa fa-info-circle\" data-toggle=\"popover\" title=\"Message\" data-html=\"true\" data-placement=\"left\" data-content=\"<a href='http://google.com' target='_blank' >Click here to opt out</a>\"></span>";
+                    sponserese_banner6.InnerHtml = "Sponsored <span href=\"#\" class=\"fa fa-info-circle\" data-toggle=\"popover\" title=\"Message\" data-html=\"true\" data-placement=\"left\" data-content=\"<a href='http://google.com' target='_blank' >Click here to opt out</a>\"></span>";
+                }
+                else if (sponsered_or_adv == "adv")
+                {
+                    //sponsore_banner2.InnerHtml = "Adv <span href=\"#\" class=\"fa fa-info-circle\" data-toggle=\"popover\" title=\"Message\" data-html=\"true\" data-placement=\"right\" data-content=\"<a href='http://google.com' target='_blank' >Click here to opt out</a>\"></span>";
+                    sponsore_banner2.InnerHtml = "Adv";
+                    //sponsore_banner3.InnerHtml = "Adv";
+                    sponsers_banner4.InnerHtml = "Adv <span href=\"#\" class=\"fa fa-info-circle\" data-toggle=\"popover\" title=\"Message\" data-html=\"true\" data-placement=\"left\" data-content=\"<a href='http://google.com' target='_blank' >Click here to opt out</a>\"></span>";
+                    sponserese_banner_5.InnerHtml = "Adv <span href=\"#\" class=\"fa fa-info-circle\" data-toggle=\"popover\" title=\"Message\" data-html=\"true\" data-placement=\"left\" data-content=\"<a href='http://google.com' target='_blank' >Click here to opt out</a>\"></span>";
+                    sponserese_banner6.InnerHtml = "Adv <span href=\"#\" class=\"fa fa-info-circle\" data-toggle=\"popover\" title=\"Message\" data-html=\"true\" data-placement=\"left\" data-content=\"<a href='http://google.com' target='_blank' >Click here to opt out</a>\"></span>";
+                }
+
+                #endregion
+
+                #region setting Up Banners Icons And Images
+                string banner_style = ds.Tables[0].Rows[0].ItemArray[12].ToString();
+                string file_name = "";
+                string main_banner_img_string = ds.Tables[0].Rows[0].ItemArray[6].ToString();
+                if (main_banner_img_string != "")
+                {
+                    string[] strArr = main_banner_img_string.Split('/');
+                    file_name = strArr[2].ToString();
+                }
+                string icon_img_file_name = ds.Tables[0].Rows[0].ItemArray[14].ToString();
+                string file_name_icon = "";
+                if (icon_img_file_name != "")
+                {
+                    string[] str2 = icon_img_file_name.Split('/');
+                    file_name_icon = str2[2].ToString();
+                }
+
+                #endregion
+
+                #region assembling banner 2
+
+                icon_img_banner2.Src = "http://camp.earthinfralanddevelopers.co.in/Campaign_Images/" + file_name_icon;
+                title_banner2.InnerText = ds.Tables[0].Rows[0].ItemArray[2].ToString();
+                if (banner_id == "Banner 2")
+                {
+                    if (Convert.ToBoolean(ds.Tables[0].Rows[0]["ShowCallToAction"]) == false)
                     {
-                        //sponsore_banner2.InnerHtml = "Sponsored <span href=\"#\" class=\"fa fa-info-circle\" data-toggle=\"popover\" title=\"Message\" data-html=\"true\" data-placement=\"right\" data-content=\"<a href='http://google.com' target='_blank' >Click here to opt out</a>\"></span>";
-                        sponsore_banner2.InnerHtml = "Sponsored";
-
-                        sponsers_banner4.InnerHtml = "Sponsored <span href=\"#\" class=\"fa fa-info-circle\" data-toggle=\"popover\" title=\"Message\" data-html=\"true\" data-placement=\"left\" data-content=\"<a href='http://google.com' target='_blank' >Click here to opt out</a>\"></span>";
-                        sponserese_banner_5.InnerHtml = "Sponsored <span href=\"#\" class=\"fa fa-info-circle\" data-toggle=\"popover\" title=\"Message\" data-html=\"true\" data-placement=\"left\" data-content=\"<a href='http://google.com' target='_blank' >Click here to opt out</a>\"></span>";
-                        sponserese_banner6.InnerHtml = "Sponsored <span href=\"#\" class=\"fa fa-info-circle\" data-toggle=\"popover\" title=\"Message\" data-html=\"true\" data-placement=\"left\" data-content=\"<a href='http://google.com' target='_blank' >Click here to opt out</a>\"></span>";
+                        action_button_banner2.Style.Add("display", "none");
+                        DivRateBanner2.Style.Add("display", "none");
                     }
-                    else if (sponsered_or_adv == "adv")
+                }
+
+                //install_link_banner2.Text = ds.Tables[0].Rows[0].ItemArray[5].ToString();
+                camp_id_banner2.InnerText = campign_id;
+                //icon_img_banner2.Src = "http://camp.earthinfralanddevelopers.co.in/Campaign_Images/" + file_name;
+                icon_img_banner2.Src = RezizeImage(65, 65, domain, file_name);
+                rate_img_1_banner2.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
+                rate_img_2_banner2.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
+                rate_img_3_banner2.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
+                rate_img_4_banner2.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
+                rate_img_5_banner2.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
+
+                #endregion
+
+                #region assembling banner 3
+                title_banner3.InnerText = ds.Tables[0].Rows[0].ItemArray[2].ToString();
+
+                //mini_title_banner3.InnerText = ds.Tables[0].Rows[0].ItemArray[2].ToString();
+                discription_banner3.InnerHtml = System.Net.WebUtility.HtmlDecode(dspage.Tables[0].Rows[0].ItemArray[3].ToString().Replace("&nbsp;", " "));
+                camp_id_banner3.InnerText = campign_id;
+                //image_banner_3.Src = "http://camp.earthinfralanddevelopers.co.in/Campaign_Images/" + file_name;
+                if (Request.QueryString["width"] != null)
+                {
+                    int imgWidth = Int32.Parse(Request.QueryString["width"]);
+                    int imgHeight = (imgWidth * 138) / 347;
+                    image_banner_3.Src = RezizeImage(imgWidth, imgHeight, domain, file_name);
+                }
+                else
+                {
+                    image_banner_3.Src = domain + "Campaign_Images\\" + file_name;
+                }
+                //icon_img_banner3.Src = "http://camp.earthinfralanddevelopers.co.in/Campaign_Images/" + file_name_icon;
+                //star_img_1_banner3.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
+                //star_img_2_banner3.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
+                //star_img_3_banner3.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
+                //star_img_4_banner3.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
+                //star_img_5_banner3.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
+                #endregion
+
+                #region assembling banner 4
+
+                //camp_id_banner4.InnerText = campign_id;
+                #endregion
+
+                #region assembling banner 5 (formly banner 6)
+                // title_banner_6.InnerText = ds.Tables[0].Rows[0].ItemArray[2].ToString();
+                hdnfBanner2Code.Value = campign_id;
+
+                if (banner_id == "Banner 5")
+                {
+                    string banT = ds.Tables[0].Rows[0].ItemArray[26].ToString();
+                    int bannerType = Convert.ToInt32(banT);
+                    string playBtnClass = ds.Tables[0].Rows[0].ItemArray[27].ToString();
+                    if (playBtnClass == "" || !(osType == "Windows" || osType == "Android")) { playButton.Attributes.Add("style", "display: none;"); }
+                    else { playVideo.Attributes.Add("class", playBtnClass); }
+                    if (bannerType == 1)
                     {
-                        //sponsore_banner2.InnerHtml = "Adv <span href=\"#\" class=\"fa fa-info-circle\" data-toggle=\"popover\" title=\"Message\" data-html=\"true\" data-placement=\"right\" data-content=\"<a href='http://google.com' target='_blank' >Click here to opt out</a>\"></span>";
-                        sponsore_banner2.InnerHtml = "Adv";
-                        //sponsore_banner3.InnerHtml = "Adv";
-                        sponsers_banner4.InnerHtml = "Adv <span href=\"#\" class=\"fa fa-info-circle\" data-toggle=\"popover\" title=\"Message\" data-html=\"true\" data-placement=\"left\" data-content=\"<a href='http://google.com' target='_blank' >Click here to opt out</a>\"></span>";
-                        sponserese_banner_5.InnerHtml = "Adv <span href=\"#\" class=\"fa fa-info-circle\" data-toggle=\"popover\" title=\"Message\" data-html=\"true\" data-placement=\"left\" data-content=\"<a href='http://google.com' target='_blank' >Click here to opt out</a>\"></span>";
-                        sponserese_banner6.InnerHtml = "Adv <span href=\"#\" class=\"fa fa-info-circle\" data-toggle=\"popover\" title=\"Message\" data-html=\"true\" data-placement=\"left\" data-content=\"<a href='http://google.com' target='_blank' >Click here to opt out</a>\"></span>";
-                    }
-
-                    #endregion
-
-                    #region setting Up Banners Icons And Images
-                    string banner_style = ds.Tables[0].Rows[0].ItemArray[12].ToString();
-                    string file_name = "";
-                    string main_banner_img_string = ds.Tables[0].Rows[0].ItemArray[6].ToString();
-                    if (main_banner_img_string != "")
-                    {
-                        string[] strArr = main_banner_img_string.Split('/');
-                        file_name = strArr[2].ToString();
-                    }
-                    string icon_img_file_name = ds.Tables[0].Rows[0].ItemArray[14].ToString();
-                    string file_name_icon = "";
-                    if (icon_img_file_name != "")
-                    {
-                        string[] str2 = icon_img_file_name.Split('/');
-                        file_name_icon = str2[2].ToString();
-                    }
-
-                    #endregion
-
-                    #region assembling banner 2
-
-                    icon_img_banner2.Src = "http://camp.earthinfralanddevelopers.co.in/Campaign_Images/" + file_name_icon;
-                    title_banner2.InnerText = ds.Tables[0].Rows[0].ItemArray[2].ToString();
-                    if (banner_id == "Banner 2")
-                    {
-                        if (Convert.ToBoolean(ds.Tables[0].Rows[0]["ShowCallToAction"]) == false)
+                        string panel1_img = ds.Tables[0].Rows[0].ItemArray[16].ToString();
+                        string panel1_ImageName = string.Empty;
+                        string panel1ImgURL = "";
+                        if (panel1_img != "")
                         {
-                            action_button_banner2.Style.Add("display", "none");
-                            DivRateBanner2.Style.Add("display", "none");
+                            string[] panel1_img_Array = panel1_img.Split('/');
+                            panel1_ImageName = panel1_img_Array[2].ToString().Trim();
                         }
-                    }
-
-                    //install_link_banner2.Text = ds.Tables[0].Rows[0].ItemArray[5].ToString();
-                    camp_id_banner2.InnerText = campign_id;
-                    //icon_img_banner2.Src = "http://camp.earthinfralanddevelopers.co.in/Campaign_Images/" + file_name;
-                    icon_img_banner2.Src = RezizeImage(65, 65, domain, file_name);
-                    rate_img_1_banner2.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
-                    rate_img_2_banner2.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
-                    rate_img_3_banner2.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
-                    rate_img_4_banner2.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
-                    rate_img_5_banner2.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
-
-                    #endregion
-
-                    #region assembling banner 3
-                    title_banner3.InnerText = ds.Tables[0].Rows[0].ItemArray[2].ToString();
-
-                    //mini_title_banner3.InnerText = ds.Tables[0].Rows[0].ItemArray[2].ToString();
-                    discription_banner3.InnerHtml = System.Net.WebUtility.HtmlDecode(dspage.Tables[0].Rows[0].ItemArray[3].ToString().Replace("&nbsp;", " "));
-                    camp_id_banner3.InnerText = campign_id; 
-                    //image_banner_3.Src = "http://camp.earthinfralanddevelopers.co.in/Campaign_Images/" + file_name;
-                    if (Request.QueryString["width"] != null)
-                    {
-                        int imgWidth = Int32.Parse(Request.QueryString["width"]);
-                        int imgHeight = (imgWidth * 138) / 347;
-                        image_banner_3.Src = RezizeImage(imgWidth, imgHeight, domain, file_name);
-                    }
-                    else
-                    {
-                        image_banner_3.Src = domain + "Campaign_Images\\" + file_name;
-                    }
-                    //icon_img_banner3.Src = "http://camp.earthinfralanddevelopers.co.in/Campaign_Images/" + file_name_icon;
-                    //star_img_1_banner3.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
-                    //star_img_2_banner3.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
-                    //star_img_3_banner3.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
-                    //star_img_4_banner3.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
-                    //star_img_5_banner3.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
-                    #endregion
-
-                    #region assembling banner 4
-
-                    //camp_id_banner4.InnerText = campign_id;
-                    #endregion
-
-                    #region assembling banner 5 (formly banner 6)
-                    // title_banner_6.InnerText = ds.Tables[0].Rows[0].ItemArray[2].ToString();
-                    hdnfBanner2Code.Value = campign_id;
-
-                    if (banner_id == "Banner 5")
-                    {
-                        string banT = ds.Tables[0].Rows[0].ItemArray[26].ToString();
-                        int bannerType = Convert.ToInt32(banT);
-                        string playBtnClass = ds.Tables[0].Rows[0].ItemArray[27].ToString();
-                        string osType = Request.QueryString["os_type"].ToString();
-                        if (playBtnClass == "" || !(osType == "Windows" || osType == "Android")) { playButton.Attributes.Add("style", "display: none;"); }
-                        else { playVideo.Attributes.Add("class", playBtnClass); }
-                        if (bannerType == 1)
+                        if (System.IO.File.Exists((domain + "Campaign_Images\\" + panel1_ImageName.ToString())))
                         {
-                            string panel1_img = ds.Tables[0].Rows[0].ItemArray[16].ToString();
-                            string panel1_ImageName = string.Empty;
-                            string panel1ImgURL = "";
-                            if (panel1_img != "")
-                            {
-                                string[] panel1_img_Array = panel1_img.Split('/');
-                                panel1_ImageName = panel1_img_Array[2].ToString().Trim();
-                            }
-                            if (System.IO.File.Exists((domain + "Campaign_Images\\" + panel1_ImageName.ToString())))
-                            {
-                                panel1ImgURL = RezizeImage(15000, 15000, domain, panel1_ImageName);
-                            }
-
-                            string panel2_1_img = ds.Tables[0].Rows[0].ItemArray[17].ToString();
-                            string panel2_1_ImageName = string.Empty;
-                            string panel2_1ImgURL = "";
-                            if (panel2_1_img != "")
-                            {
-                                string[] panel2_1_img_Array = panel2_1_img.Split('/');
-                                panel2_1_ImageName = panel2_1_img_Array[2].ToString().Trim();
-                            }
-                            if (System.IO.File.Exists((domain + "Campaign_Images\\" + panel2_1_ImageName.ToString())))
-                            {
-                                panel2_1ImgURL = RezizeImage(15000, 15000, domain, panel2_1_ImageName);
-                            }
-
-                            string panel2_2_img = ds.Tables[0].Rows[0].ItemArray[18].ToString();
-                            string panel2_2_ImageName = string.Empty;
-                            string panel2_2ImgURL = "";
-                            if (panel2_2_img != "")
-                            {
-                                string[] panel2_2_img_Array = panel2_2_img.Split('/');
-                                panel2_2_ImageName = panel2_2_img_Array[2].ToString().Trim();
-                            }
-                            if (System.IO.File.Exists((domain + "Campaign_Images\\" + panel2_2_ImageName.ToString())))
-                            {
-                                panel2_2ImgURL = RezizeImage(15000, 15000, domain, panel2_2_ImageName);
-                            }
-
-                            videoBanner1.Visible = true;
-                            videoBanner2.Visible = false;
-                            panel1.Attributes.Add("style", "background-image:url('" + panel1ImgURL + "')");
-                            string panel1Animation = ds.Tables[0].Rows[0].ItemArray[21].ToString();
-                            if (panel1Animation.Contains(","))
-                            {
-                                string[] p1 = panel1Animation.Split(',');
-                                panel1.Attributes.Add("class", "animated");
-                                panel1.Attributes.Add("data-animation", p1[1]);
-                                panel1.Attributes.Add("data-delay", p1[0]);
-                            }
-                            else
-                            {
-                                panel1.Attributes.Add("class", "animated");
-                                panel1.Attributes.Add("data-animation", panel1Animation);
-                                panel1.Attributes.Add("data-delay", "0");
-                            }
-                            
-                            panel2_1.Attributes.Add("style", "background-image:url('" + panel2_1ImgURL + "')");
-                            string panel21Animation = ds.Tables[0].Rows[0].ItemArray[22].ToString();
-                            if (panel21Animation.Contains(","))
-                            {
-                                string[] p1 = panel21Animation.Split(',');
-                                panel2_1.Attributes.Add("class", "animated");
-                                panel2_1.Attributes.Add("data-animation", p1[1]);
-                                panel2_1.Attributes.Add("data-delay", p1[0]);
-                            }
-                            else
-                            {
-                                panel2_1.Attributes.Add("class", "animated");
-                                panel2_1.Attributes.Add("data-animation", panel21Animation);
-                                panel2_1.Attributes.Add("data-delay", "0");
-                            }
-
-                            panel2_2.Attributes.Add("style", "background-image:url('" + panel2_2ImgURL + "')");
-                            string panel22Animation = ds.Tables[0].Rows[0].ItemArray[23].ToString();
-                            if (panel22Animation.Contains(","))
-                            {
-                                string[] p1 = panel22Animation.Split(',');
-                                panel2_2.Attributes.Add("class", "animated");
-                                panel2_2.Attributes.Add("data-animation", p1[1]);
-                                panel2_2.Attributes.Add("data-delay", p1[0]);
-                            }
-                            else
-                            {
-                                panel2_2.Attributes.Add("class", "animated" + panel22Animation);
-                                panel2_2.Attributes.Add("data-animation", panel22Animation);
-                                panel2_2.Attributes.Add("data-delay", "0");
-                            }
-                            //panel2_2.Attributes.Add("class", "animated " + ds.Tables[0].Rows[0].ItemArray[23].ToString());
+                            panel1ImgURL = RezizeImage(15000, 15000, domain, panel1_ImageName);
                         }
-                        else if (bannerType == 2)
+
+                        string panel2_1_img = ds.Tables[0].Rows[0].ItemArray[17].ToString();
+                        string panel2_1_ImageName = string.Empty;
+                        string panel2_1ImgURL = "";
+                        if (panel2_1_img != "")
                         {
-                            string panel3_img = ds.Tables[0].Rows[0].ItemArray[19].ToString();
-                            string panel3_ImageName = string.Empty;
-                            string panel3ImgURL = "";
-                            if (panel3_img != "")
-                            {
-                                string[] panel3_img_Array = panel3_img.Split('/');
-                                panel3_ImageName = panel3_img_Array[2].ToString().Trim();
-                            }
-                            if (System.IO.File.Exists((domain + "Campaign_Images\\" + panel3_ImageName.ToString())))
-                            {
-                                panel3ImgURL = RezizeImage(15000, 15000, domain, panel3_ImageName);
-                            }
-                            string panel4_img = ds.Tables[0].Rows[0].ItemArray[20].ToString();
-                            string panel4_ImageName = string.Empty;
-                            string panel4ImgURL = "";
-                            if (panel4_img != "")
-                            {
-                                string[] panel4_img_Array = panel4_img.Split('/');
-                                panel4_ImageName = panel4_img_Array[2].ToString().Trim();
-                            }
-                            if (System.IO.File.Exists((domain + "Campaign_Images\\" + panel4_ImageName.ToString())))
-                            {
-                                panel4ImgURL = RezizeImage(15000, 15000, domain, panel4_ImageName);
-                            }
+                            string[] panel2_1_img_Array = panel2_1_img.Split('/');
+                            panel2_1_ImageName = panel2_1_img_Array[2].ToString().Trim();
+                        }
+                        if (System.IO.File.Exists((domain + "Campaign_Images\\" + panel2_1_ImageName.ToString())))
+                        {
+                            panel2_1ImgURL = RezizeImage(15000, 15000, domain, panel2_1_ImageName);
+                        }
 
-                            videoBanner1.Visible = false;
-                            videoBanner2.Visible = true;
-                            panel3.Attributes.Add("style", "background-image:url('" + panel3ImgURL + "')");
-                            string panel3Animation = ds.Tables[0].Rows[0].ItemArray[24].ToString();
-                            if (panel3Animation.Contains(","))
-                            {
-                                string[] p1 = panel3Animation.Split(',');
-                                panel3.Attributes.Add("class", "animated");
-                                panel3.Attributes.Add("data-animation", p1[1]);
-                                panel3.Attributes.Add("data-delay", p1[0]);
-                            }
-                            else
-                            {
-                                panel3.Attributes.Add("class", "animated");
-                                panel3.Attributes.Add("data-animation", panel3Animation);
-                                panel3.Attributes.Add("data-delay", "0");
-                            }
-                            //panel3.Attributes.Add("class", "animated " + ds.Tables[0].Rows[0].ItemArray[24].ToString());
+                        string panel2_2_img = ds.Tables[0].Rows[0].ItemArray[18].ToString();
+                        string panel2_2_ImageName = string.Empty;
+                        string panel2_2ImgURL = "";
+                        if (panel2_2_img != "")
+                        {
+                            string[] panel2_2_img_Array = panel2_2_img.Split('/');
+                            panel2_2_ImageName = panel2_2_img_Array[2].ToString().Trim();
+                        }
+                        if (System.IO.File.Exists((domain + "Campaign_Images\\" + panel2_2_ImageName.ToString())))
+                        {
+                            panel2_2ImgURL = RezizeImage(15000, 15000, domain, panel2_2_ImageName);
+                        }
 
-                            panel4.Attributes.Add("style", "background-image:url('" + panel4ImgURL + "')");
-                            string panel4Animation = ds.Tables[0].Rows[0].ItemArray[25].ToString();
-                            if (panel4Animation.Contains(","))
-                            {
-                                string[] p1 = panel4Animation.Split(',');
-                                panel4.Attributes.Add("class", "animated");
-                                panel3.Attributes.Add("data-animation", p1[1]);
-                                panel4.Attributes.Add("data-delay", p1[0]);
-                            }
-                            else
-                            {
-                                panel4.Attributes.Add("class", "animated");
-                                panel3.Attributes.Add("data-animation", panel4Animation);
-                                panel4.Attributes.Add("data-delay", "0");
-                            }
-                            //panel4.Attributes.Add("class", "animated " + ds.Tables[0].Rows[0].ItemArray[25].ToString());
+                        videoBanner1.Visible = true;
+                        videoBanner2.Visible = false;
+                        panel1.Attributes.Add("style", "background-image:url('" + panel1ImgURL + "')");
+                        string panel1Animation = ds.Tables[0].Rows[0].ItemArray[21].ToString();
+                        if (panel1Animation.Contains(","))
+                        {
+                            string[] p1 = panel1Animation.Split(',');
+                            panel1.Attributes.Add("class", "animated");
+                            panel1.Attributes.Add("data-animation", p1[1]);
+                            panel1.Attributes.Add("data-delay", p1[0]);
                         }
                         else
                         {
-                            videoBanner1.Visible = false;
-                            videoBanner2.Visible = false;
+                            panel1.Attributes.Add("class", "animated");
+                            panel1.Attributes.Add("data-animation", panel1Animation);
+                            panel1.Attributes.Add("data-delay", "0");
                         }
-                    }
-                    //star_img_1_banner6.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
-                    //star_img_2_banner6.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
-                    //star_img_3_banner6.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
-                    //star_img_4_banner6.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
-                    //star_img_5_banner6.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
-                    //icon_img_banner_6.Src = "http://camp.earthinfralanddevelopers.co.in/Campaign_Images/" + file_name_icon;
-                    #endregion
 
-                    HiddenViewCount.Value = campign_id.ToString() + ";" + Request.QueryString["affiliate_id"].ToString() + ";" + Request.QueryString["domain_name"].ToString() + ";" + _ClientSystemOs.ToString();// +";" + Request.QueryString["Website"].ToString();
-                    return campign_id;
+                        panel2_1.Attributes.Add("style", "background-image:url('" + panel2_1ImgURL + "')");
+                        string panel21Animation = ds.Tables[0].Rows[0].ItemArray[22].ToString();
+                        if (panel21Animation.Contains(","))
+                        {
+                            string[] p1 = panel21Animation.Split(',');
+                            panel2_1.Attributes.Add("class", "animated");
+                            panel2_1.Attributes.Add("data-animation", p1[1]);
+                            panel2_1.Attributes.Add("data-delay", p1[0]);
+                        }
+                        else
+                        {
+                            panel2_1.Attributes.Add("class", "animated");
+                            panel2_1.Attributes.Add("data-animation", panel21Animation);
+                            panel2_1.Attributes.Add("data-delay", "0");
+                        }
+
+                        panel2_2.Attributes.Add("style", "background-image:url('" + panel2_2ImgURL + "')");
+                        string panel22Animation = ds.Tables[0].Rows[0].ItemArray[23].ToString();
+                        if (panel22Animation.Contains(","))
+                        {
+                            string[] p1 = panel22Animation.Split(',');
+                            panel2_2.Attributes.Add("class", "animated");
+                            panel2_2.Attributes.Add("data-animation", p1[1]);
+                            panel2_2.Attributes.Add("data-delay", p1[0]);
+                        }
+                        else
+                        {
+                            panel2_2.Attributes.Add("class", "animated" + panel22Animation);
+                            panel2_2.Attributes.Add("data-animation", panel22Animation);
+                            panel2_2.Attributes.Add("data-delay", "0");
+                        }
+                        //panel2_2.Attributes.Add("class", "animated " + ds.Tables[0].Rows[0].ItemArray[23].ToString());
+                    }
+                    else if (bannerType == 2)
+                    {
+                        string panel3_img = ds.Tables[0].Rows[0].ItemArray[19].ToString();
+                        string panel3_ImageName = string.Empty;
+                        string panel3ImgURL = "";
+                        if (panel3_img != "")
+                        {
+                            string[] panel3_img_Array = panel3_img.Split('/');
+                            panel3_ImageName = panel3_img_Array[2].ToString().Trim();
+                        }
+                        if (System.IO.File.Exists((domain + "Campaign_Images\\" + panel3_ImageName.ToString())))
+                        {
+                            panel3ImgURL = RezizeImage(15000, 15000, domain, panel3_ImageName);
+                        }
+                        string panel4_img = ds.Tables[0].Rows[0].ItemArray[20].ToString();
+                        string panel4_ImageName = string.Empty;
+                        string panel4ImgURL = "";
+                        if (panel4_img != "")
+                        {
+                            string[] panel4_img_Array = panel4_img.Split('/');
+                            panel4_ImageName = panel4_img_Array[2].ToString().Trim();
+                        }
+                        if (System.IO.File.Exists((domain + "Campaign_Images\\" + panel4_ImageName.ToString())))
+                        {
+                            panel4ImgURL = RezizeImage(15000, 15000, domain, panel4_ImageName);
+                        }
+
+                        videoBanner1.Visible = false;
+                        videoBanner2.Visible = true;
+                        panel3.Attributes.Add("style", "background-image:url('" + panel3ImgURL + "')");
+                        string panel3Animation = ds.Tables[0].Rows[0].ItemArray[24].ToString();
+                        if (panel3Animation.Contains(","))
+                        {
+                            string[] p1 = panel3Animation.Split(',');
+                            panel3.Attributes.Add("class", "animated");
+                            panel3.Attributes.Add("data-animation", p1[1]);
+                            panel3.Attributes.Add("data-delay", p1[0]);
+                        }
+                        else
+                        {
+                            panel3.Attributes.Add("class", "animated");
+                            panel3.Attributes.Add("data-animation", panel3Animation);
+                            panel3.Attributes.Add("data-delay", "0");
+                        }
+                        //panel3.Attributes.Add("class", "animated " + ds.Tables[0].Rows[0].ItemArray[24].ToString());
+
+                        panel4.Attributes.Add("style", "background-image:url('" + panel4ImgURL + "')");
+                        string panel4Animation = ds.Tables[0].Rows[0].ItemArray[25].ToString();
+                        if (panel4Animation.Contains(","))
+                        {
+                            string[] p1 = panel4Animation.Split(',');
+                            panel4.Attributes.Add("class", "animated");
+                            panel3.Attributes.Add("data-animation", p1[1]);
+                            panel4.Attributes.Add("data-delay", p1[0]);
+                        }
+                        else
+                        {
+                            panel4.Attributes.Add("class", "animated");
+                            panel3.Attributes.Add("data-animation", panel4Animation);
+                            panel4.Attributes.Add("data-delay", "0");
+                        }
+                        //panel4.Attributes.Add("class", "animated " + ds.Tables[0].Rows[0].ItemArray[25].ToString());
+                    }
+                    else
+                    {
+                        videoBanner1.Visible = false;
+                        videoBanner2.Visible = false;
+                    }
                 }
-                else
-                    return "";
+                //star_img_1_banner6.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
+                //star_img_2_banner6.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
+                //star_img_3_banner6.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
+                //star_img_4_banner6.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
+                //star_img_5_banner6.Src = "http://camp.earthinfralanddevelopers.co.in/admin/img/rating.png";
+                //icon_img_banner_6.Src = "http://camp.earthinfralanddevelopers.co.in/Campaign_Images/" + file_name_icon;
+                #endregion
+
+                HiddenViewCount.Value = campign_id.ToString() + ";" + Request.QueryString["affiliate_id"].ToString() + ";" + Request.QueryString["domain_name"].ToString() + ";" + _ClientSystemOs.ToString();// +";" + Request.QueryString["Website"].ToString();
+                return campign_id;
             }
             else
+            {
+                Session.Add("dspage", null);
+                Session.Add("bnrID", null);
+                Session.Add("UserWebsite", null);
+                Session.Add("affID", null);
+                Session.Add("domName", null);
+                Session.Add("OsType", null);
+                Session.Add("CountryName", null);
                 return null;
-        }
+            }
+            }
+            #endregion
         catch (Exception ex)
         {
+            Session.Add("dspage", null);
+            Session.Add("bnrID", null);
+            Session.Add("UserWebsite", null);
+            Session.Add("affID", null);
+            Session.Add("domName", null);
+            Session.Add("OsType", null);
+            Session.Add("CountryName", null);
             return null;
         }
     }
@@ -714,8 +833,9 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
             string ComputerId = string.Empty;
             System.Collections.ArrayList colCookies = new System.Collections.ArrayList();
             for (int i = 0; i < Request.Cookies.Count; i++)
+            {
                 colCookies.Add(Request.Cookies[i]);
-            string[] Arr;
+            }
 
             foreach (var item in colCookies)
             {
@@ -798,11 +918,16 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
         {
             string s1 = string.Empty;
             btnBanner1Click.Style.Add("background-color", "white");
-            if (Request.QueryString["banner_id"] == "Banner 1" || Request.QueryString["banner_id"] == "Banner 4")
-                s1 = load_ad_copy();
-            else
-                s1 = randomcampid.InnerHtml.ToString();
-
+            //if (Request.QueryString["banner_id"] == "Banner 1" || Request.QueryString["banner_id"] == "Banner 4")
+            //    s1 = load_ad_copy();
+            //else
+            s1 = randomcampid.InnerHtml.ToString();
+            string[] campIds = s1.Split(',');
+            string campIdFilter = string.Empty;
+            for(int i = 0; i < campIds.Length; i++)
+            {
+                campIdFilter += campIdFilter == string.Empty ? string.Format("WHERE campaign_id = '{0}'", campIds[i]) : string.Format(" OR campaign_id = '{0}'", campIds[i]);
+            }
 
             if (s1 != null)
             {
@@ -812,7 +937,7 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                 string banner_id = Request.QueryString["banner_id"];
                 string showCallToAction = Request.QueryString["ShowCallToAct"];
                 con.Open();
-                SqlDataAdapter adp = new SqlDataAdapter("SELECT * FROM [dbo].[campaigns] where campaign_id='" + s1 + "'", con);
+                SqlDataAdapter adp = new SqlDataAdapter("SELECT * FROM [dbo].[campaigns] " + campIdFilter , con);
                 DataSet ds = new DataSet();
                 adp.Fill(ds);
                 con.Close();
@@ -985,10 +1110,12 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                     discription_banner3.Style.Add("color", "#" + Request.QueryString["DescriptionColor"].ToString());
 
                     int a = Convert.ToInt32(ds.Tables[0].Rows[0].ItemArray[8]);
-                    banener_visible_check(s1);
                     string strBannerName = string.Empty;
                     if (banner2.Visible == true)
+                    {
                         strBannerName = banner2.ID.ToString();
+                        banener_visible_check(s1);
+                    }
                     else if (banner3.Visible == true)
                         strBannerName = banner3.ID.ToString();
                     else if (banner4.Visible == true)
@@ -1011,17 +1138,17 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                         string lat = Request.QueryString["lat"];
                         if (viewState == 1)
                         {
-                            if (banner_id == "Banner 1" || banner_id == "Banner 4")
-                            {
-                                for (int countLoop = 0; countLoop < int.Parse(Request.QueryString["NoOfBanner1"].ToString().Trim()); countLoop++)
-                                {
-                                    increase_view_of_ad(dspage.Tables[0].Rows[countLoop].ItemArray[0].ToString(), banner_id, sessionId);
-                                }
-                            }
-                            else
-                            {
+                            //if (banner_id == "Banner 1" || banner_id == "Banner 4")
+                            //{
+                            //    //for (int countLoop = 0; countLoop <= dspage.Tables[0].Rows.Count -1 ; countLoop++)
+                            //    //{
+                            //        increase_view_of_ad(s1, banner_id, sessionId);
+                            //    //}
+                            //}
+                            //else
+                            //{
                                 increase_view_of_ad(s1, banner_id, sessionId);
-                            }
+                            //}
                             storeRequestLocation("Request",s1, affiliate_id, domain_name, os_type, country, state, city, ISP, lon, lat);
                         }
                         else
@@ -1033,17 +1160,17 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                                     event_type = "Impression";
                                 else
                                     event_type = "View";
-                                if (banner_id == "Banner 1" || banner_id == "Banner 4")
-                                {
-                                    for (int countLoop = 0; countLoop < int.Parse(Request.QueryString["NoOfBanner1"].ToString().Trim()); countLoop++)
-                                    {
-                                        IncreaseAdRequest(dspage.Tables[0].Rows[countLoop].ItemArray[0].ToString(), affiliate_id, domain_name, event_type, os_type, country, sessionId);
-                                    }
-                                }
-                                else
-                                {
+                                //if (banner_id == "Banner 1" || banner_id == "Banner 4")
+                                //{
+                                //    for (int countLoop = 0; countLoop < int.Parse(Request.QueryString["NoOfBanner1"].ToString().Trim()); countLoop++)
+                                //    {
+                                //        IncreaseAdRequest(dspage.Tables[0].Rows[countLoop].ItemArray[0].ToString(), affiliate_id, domain_name, event_type, os_type, country, sessionId);
+                                //    }
+                                //}
+                                //else
+                                //{
                                     IncreaseAdRequest(s1, affiliate_id, domain_name, event_type, os_type, country, sessionId);
-                                }
+                                //}
                                 storeRequestLocation("Request",s1, affiliate_id, domain_name, os_type, country, state, city, ISP, lon, lat);
                             }
                         }
@@ -1448,31 +1575,41 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                 DataTable dtGetCost = new DataTable();
                 adp.Fill(dtGetCost);
                 #endregion
+                string[] campIds = camp_id.Split(',');
 
                 string sqlQuery = string.Empty;
                 if (event_name == "View" || event_name == "Impression")
                 {
-                    sqlQuery = "insert into view_click_maintain_on_daily_base (campain_id,affiliate_id,Website,event_found,even_type,event_date,date,OS_type,CountryName) values('" + camp_id + "', '" + affiliate_id + "', '" + domain_name + "','Yes', '" + event_name + "', '" + System.DateTime.Now + "','" + System.DateTime.Now + "','" + OsType + "','" + CountryName + "');";
-                    if (event_name == "View")
+                    for (int count = 0; count < campIds.Length; count++)
                     {
-                        sqlQuery += "UPDATE campain_details SET total_views=total_views+1 WHERE campain_id='" + camp_id + "'";
+                        sqlQuery += "insert into view_click_maintain_on_daily_base (campain_id,affiliate_id,Website,event_found,even_type,event_date,date,OS_type,CountryName) values('" + campIds[count] + "', '" + affiliate_id + "', '" + domain_name + "','Yes', '" + event_name + "', '" + System.DateTime.Now + "','" + System.DateTime.Now + "','" + OsType + "','" + CountryName + "');";
+                        if (event_name == "View")
+                        {
+                            sqlQuery += "UPDATE campain_details SET total_views=total_views+1 WHERE campain_id='" + campIds[count] + "';";
+                        }
                     }
                 }
                 else if (event_name == "Click")
                 {
-                    sqlQuery = "insert into view_click_maintain_on_daily_base (campain_id,affiliate_id,Website,event_found,even_type,event_date,date,OS_type,CountryName,ClickId,clickCost) values('" + camp_id + "', '" + affiliate_id + "', '" + domain_name + "','Yes', '" + event_name + "', '" + System.DateTime.Now + "','" + System.DateTime.Now + "','" + OsType + "','" + CountryName + "','" + sid + "','" + dtGetCost.Rows[0]["cost"].ToString() + "');";
-                    //sqlQuery += "UPDATE campain_details SET total_views=total_views+1 WHERE campain_id='" + camp_id + "'";
+                    for (int count = 0; count < campIds.Length; count++)
+                    {
+                        sqlQuery += "insert into view_click_maintain_on_daily_base (campain_id,affiliate_id,Website,event_found,even_type,event_date,date,OS_type,CountryName,ClickId,clickCost) values('" + campIds[count] + "', '" + affiliate_id + "', '" + domain_name + "','Yes', '" + event_name + "', '" + System.DateTime.Now + "','" + System.DateTime.Now + "','" + OsType + "','" + CountryName + "','" + sid + "','" + dtGetCost.Rows[0]["cost"].ToString() + "');";
+                        //sqlQuery += "UPDATE campain_details SET total_views=total_views+1 WHERE campain_id='" + camp_id + "'";
+                    }
                 }
                 else if (event_name == "AdRequest")
                 {
-                    sqlQuery = "insert into view_click_maintain_on_daily_base (campain_id,affiliate_id,Website,event_found,even_type,event_date,date,OS_type,CountryName) values('" + camp_id + "', '" + affiliate_id + "', '" + domain_name + "','Yes', '" + event_name + "', '" + System.DateTime.Now + "','" + System.DateTime.Now + "','" + OsType + "','" + CountryName + "')";
+
+                    for (int count = 0; count < campIds.Length; count++)
+                    {
+                        sqlQuery += "insert into view_click_maintain_on_daily_base (campain_id,affiliate_id,Website,event_found,even_type,event_date,date,OS_type,CountryName) values('" + campIds[count] + "', '" + affiliate_id + "', '" + domain_name + "','Yes', '" + event_name + "', '" + System.DateTime.Now + "','" + System.DateTime.Now + "','" + OsType + "','" + CountryName + "');";
+                    }
                 }
 
                 SqlCommand cmd = new SqlCommand(sqlQuery);
                 cmd.Connection = con;
                 int confirmation = cmd.ExecuteNonQuery();
                 con.Close();
-
 
             }
             catch
@@ -1526,21 +1663,26 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
             if (con.State == ConnectionState.Closed)
                 con.Open();
             string sqlQuery = string.Empty;
-            sqlQuery = "insert into add_request_origions (request_type,affiliate_id,campaign_id,country_name,state_name,city_name,OS_type,domain_name,ISP,longitude,latitude,date_time) values(@request_type,@affiliate_id,@campaign_id,@country_name,@state_name,@city_name,@OS_type,@domain_name,@ISP,@longitude,@latitude,GETDATE())";
-            SqlCommand cmd = new SqlCommand(sqlQuery, con);
-            cmd.Parameters.AddWithValue("@request_type", eventType);
-            cmd.Parameters.AddWithValue("@affiliate_id", affiliate_id);
-            cmd.Parameters.AddWithValue("@campaign_id",camp_id);
-            cmd.Parameters.AddWithValue("@country_name", country);
-            cmd.Parameters.AddWithValue("@state_name",state);
-            cmd.Parameters.AddWithValue("@city_name",city);
-            cmd.Parameters.AddWithValue("@OS_type",os_type);
-            cmd.Parameters.AddWithValue("@domain_name",domain_name);
-            cmd.Parameters.AddWithValue("@ISP",ISP);
-            cmd.Parameters.AddWithValue("@longitude",lon);
-            cmd.Parameters.AddWithValue("@latitude",lat);
-            cmd.CommandType = CommandType.Text;
-            int confirmation = cmd.ExecuteNonQuery();
+
+            string[] campIds = camp_id.Split(',');
+            for (int count = 0; count < campIds.Length; count++)
+            {
+                sqlQuery = "insert into add_request_origions (request_type,affiliate_id,campaign_id,country_name,state_name,city_name,OS_type,domain_name,ISP,longitude,latitude,date_time) values(@request_type,@affiliate_id,@campaign_id,@country_name,@state_name,@city_name,@OS_type,@domain_name,@ISP,@longitude,@latitude,GETDATE());";
+                SqlCommand cmd = new SqlCommand(sqlQuery, con);
+                cmd.Parameters.AddWithValue("@request_type", eventType);
+                cmd.Parameters.AddWithValue("@affiliate_id", affiliate_id);
+                cmd.Parameters.AddWithValue("@campaign_id", campIds[count]);
+                cmd.Parameters.AddWithValue("@country_name", country);
+                cmd.Parameters.AddWithValue("@state_name", state);
+                cmd.Parameters.AddWithValue("@city_name", city);
+                cmd.Parameters.AddWithValue("@OS_type", os_type);
+                cmd.Parameters.AddWithValue("@domain_name", domain_name);
+                cmd.Parameters.AddWithValue("@ISP", ISP);
+                cmd.Parameters.AddWithValue("@longitude", lon);
+                cmd.Parameters.AddWithValue("@latitude", lat);
+                cmd.CommandType = CommandType.Text;
+                int confirmation = cmd.ExecuteNonQuery();
+            }
             con.Close();
         }
         catch
@@ -1556,7 +1698,11 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                 if (con.State == ConnectionState.Closed)
                     con.Open();
                 string sqlQuery = string.Empty;
-                sqlQuery = "insert into view_click_maintain_on_daily_base (campain_id,affiliate_id,Website,event_found,even_type,event_date,date,OS_type,CountryName) values('" + camp_id + "', '" + affiliate_id + "', '" + domain_name + "','Yes', 'AdRequest', '" + System.DateTime.Now + "','" + System.DateTime.Now + "','" + OsType + "','" + CountryName + "')";
+                string[] campIds = camp_id.Split(',');
+                for (int count = 0; count < campIds.Length; count++)
+                {
+                    sqlQuery += "insert into view_click_maintain_on_daily_base (campain_id,affiliate_id,Website,event_found,even_type,event_date,date,OS_type,CountryName) values('" + campIds[count] + "', '" + affiliate_id + "', '" + domain_name + "','Yes', 'AdRequest', '" + System.DateTime.Now + "','" + System.DateTime.Now + "','" + OsType + "','" + CountryName + "');";
+                }
 
                 SqlCommand cmd = new SqlCommand(sqlQuery);
                 cmd.Connection = con;
@@ -1584,8 +1730,8 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                 event_type = "Impression";
             else
                 event_type = "View";
-            maintain_per_view(campaign_id, affiliate_id, domain_name, event_type, Request.QueryString["os_type"].ToString(), Request.QueryString["Country"].ToString(), sid);
             IncreaseAdRequest(campaign_id, affiliate_id, domain_name, event_type, Request.QueryString["os_type"].ToString(), Request.QueryString["Country"].ToString(), sid);
+            maintain_per_view(campaign_id, affiliate_id, domain_name, event_type, Request.QueryString["os_type"].ToString(), Request.QueryString["Country"].ToString(), sid);
 
         }
         catch (Exception ex)
@@ -1770,7 +1916,7 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                         }
                         sbBanner1.Append("<div  id='" + dspage.Tables[0].Rows[countLoop].ItemArray[0].ToString() + "' class='item' style=' background-color : #" + HttpContext.Current.Session["AdbgColor"].ToString() + " ; border: thin solid # " + HttpContext.Current.Session["Banner2BorderColor"].ToString() + " ; '  onclick='clicked(this)'>");
                         sbBanner1.Append("<div id='banner1' class='card' runat='server' style='border: solid 3px #CCC4C4;'>");
-                        sbBanner1.Append("<div class='card'    >");
+                        sbBanner1.Append("<div class='card'>");
                         sbBanner1.Append("<div class='title-container'>");
                         sbBanner1.Append(" <div class='col-xs-2 card-icon'>" + "<img src='" + iconURL + "' style='height: 50px; width: 50px;  margin-right: 5px; margin-top: 5px; margin-left: 5px;' runat='server' id='icon_img_banner1'   alt='banner-img' class='' />" + "</div>");
                         sbBanner1.Append("<div class='col-xs-10 wrapfont'>");
@@ -1867,11 +2013,11 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
                         sbBanner1.Append("<div class='clearfix'></div>");
                         sbBanner1.Append("</div>");
 
-                        sbBanner1.Append("<a href='" + dspage.Tables[0].Rows[countLoop].ItemArray[4].ToString() + ClickId + "' runat='server' target='_parent' id='button_anchor_tag'  style='text-decoration: none;' onclick='callBan1(this)'><div class='card-description' style='height: 137px; margin-left: 5px; color:#" + HttpContext.Current.Session["DescriptionColor"].ToString() + "'><div>");
+                        sbBanner1.Append("<a href='" + dspage.Tables[0].Rows[countLoop].ItemArray[4].ToString() + ClickId + "' runat='server' target='_parent' id='button_anchor_tag'  style='text-decoration: none;' onclick='callBan1(this)'><div class='card-description' style='margin-left: 5px; color:#" + HttpContext.Current.Session["DescriptionColor"].ToString() + "'><div>");
                         sbBanner1.Append(strDescription);
                         sbBanner1.Append("</div></div></a>");
                         sbBanner1.Append("<div class='card-banner'>");
-                        sbBanner1.Append("<span style=\"background-image: url('" + MainImageURL.ToString() + "')\" class='blurred-bg'></span>");
+                        //sbBanner1.Append("<span style=\"background-image: url('" + MainImageURL.ToString() + "')\" class='blurred-bg'></span>");
                         sbBanner1.Append("<img src='" + MainImageURL.ToString() + "' runat='server' id='banner_img_banner1' alt='banner-img'  class='img-responsive' style=' width:100%;'/>");
                         sbBanner1.Append(" </div>");
                         sbBanner1.Append("<div id='camp_id_banner1'  runat='server' style='font-size: 0pt'> " + dspage.Tables[0].Rows[countLoop].ItemArray[0].ToString() + " </div>");
@@ -1940,8 +2086,19 @@ public partial class Campaign_Ad_Panel_View : System.Web.UI.Page
     {
         try
         {
+            string country = Request.QueryString["country_name"].ToString().Trim();
+            string CountryTargettingFilter = string.Empty;
+            if (country != "")
+            {
+                CountryTargettingFilter = "(country_targeted like '%" + country + "%' OR country_targeted = '')";
+            }
+            else
+            {
+                CountryTargettingFilter = "(country_targeted = '')";
+            }
+
             con.Open();
-            string query = "SELECT  [Add_style_formate]  FROM [dbo].[campaigns]  where campaign_id='" + CookieBannerId + "' and country_targeted like '%" + Request.QueryString["country_name"] + "%' ORDER BY NEWID() ";
+            string query = "SELECT  [Add_style_formate]  FROM [dbo].[campaigns]  where campaign_id='" + CookieBannerId + "' and "+ CountryTargettingFilter + " ORDER BY NEWID() ";
 
             SqlDataAdapter adp = new SqlDataAdapter(query, con);
 

@@ -11,7 +11,7 @@ using System.Configuration;
 public partial class admin_Affiliate_master_page : System.Web.UI.MasterPage
 {
 
-
+    public string appLocation = ConfigurationManager.AppSettings["appLocation"].ToString();
     SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["conn"].ConnectionString);
     protected void Page_Load(object sender, EventArgs e)
     {

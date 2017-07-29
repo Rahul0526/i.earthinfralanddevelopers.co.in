@@ -16,10 +16,12 @@
     <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
     <link href="assets/css/font-awesome.min.css" rel="stylesheet" />
     <link href="assets/css/style.css" rel="stylesheet">
-    <link href="http://camp.earthinfralanddevelopers.co.in/Admin/assets/css/plugins.css" rel="stylesheet" />
+    <link href="assets/css/plugins.css" rel="stylesheet" />
     <link href="assets/plugins/fullcalendar/fullcalendar.css" rel="stylesheet" />
     <link href="assets/plugins/metrojs/metrojs.css" rel="stylesheet" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <link href="assets/css/rkvFunctions.css" rel="stylesheet" type="text/css" />
+    <script src="js/jquery-1.11.3.min.js"></script>
+    <script src="assets/js/rkvFunctions.js" type="text/javascript"></script>
     <script>
         var $html = jQuery('html');
         var $wrapper = jQuery('#wrapper');
@@ -29,7 +31,7 @@
         jQuery(document).ready(function () {
 
             var timer = setTimeout(function () {
-                console.log($html);
+                //console.log($html);
                 $html = jQuery('html');
                 $wrapper = jQuery('#wrapper');
                 $sidebar = jQuery('#sidebar');
@@ -120,9 +122,9 @@
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </button>
-                        <a id="menu-medium" class="sidebar-toggle tooltips">
+                        <%--<a id="menu-medium" class="sidebar-toggle tooltips">
                             <i class="fa fa-outdent"></i>
-                        </a>
+                        </a>--%>
                         <a class="navbar-brand" href="#"></a>
                     </div>
                     <div class="navbar-center"></div>
@@ -154,9 +156,9 @@
                                             <i class="fa fa-cog"></i>Account Settings
                                         </a>
                                     </li>
-                                    <li class="dropdown-footer clearfix">
-                                            <i class="fa fa-power-off"></i><asp:LinkButton ID="lnkLogout" 
-                                            runat="server" CausesValidation="false" onclick="lnkLogout_Click">Logout</asp:LinkButton>
+                                    <li class="dropdown-footer">
+                                            <asp:LinkButton ID="lnkLogout" 
+                                            runat="server" CausesValidation="false" onclick="lnkLogout_Click" style="display: inline-block; width: 100%"><i class="fa fa-power-off"></i> Logout</asp:LinkButton>
                                       
                                     </li>
                                 </ul>
@@ -164,18 +166,17 @@
                             </li>
 
                             <li id="chat-header">
-                       
-                        <div id="chat-popup" style="display:none" class="chat-popup animated" data-delay="20000" >
-                            <div class="arrow-up"></div>
-                            <div class="chat-popup-inner bg-blue">
-                               <span onclick="ClosePopOver()"><img src="img/circle-close-128.png"  height="18px" width="18px" style="float: right;"/></span>
+                                <div id="chat-popup" style="display:none" class="chat-popup animated" data-delay="20000" >
+                                    <div class="arrow-up"></div>
+                                    <div class="chat-popup-inner bg-blue">
+                                       <span onclick="ClosePopOver()"><img src="img/circle-close-128.png"  height="18px" width="18px" style="float: right;"/></span>
                                 
-                                <div><a href="update_Details.aspx" style="text-decoration: none;color:White; font-family:Calibri; font-size:16px;">
-                                    <div class="message m-t-5">Hey you there? Your Profile is not complete yet. Please complete your profile.</div></a>
+                                        <div><a href="update_Details.aspx" style="text-decoration: none;color:White; font-family:Calibri; font-size:16px;">
+                                            <div class="message m-t-5">Hey you there? Your Profile is not complete yet. Please complete your profile.</div></a>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </li>
+                            </li>
                            
                         </ul>
                     </div>
@@ -183,43 +184,46 @@
             </nav>
         <div id="wrapper">
             <nav id="sidebar">
-                    <div id="main-menu">
-                        <ul class="sidebar-nav">
-                            <li class="current">
-                                <a href="chart_view_Affiliate.aspx"><i class="fa fa-dashboard"></i><span class="sidebar-text">Dashboard</span></a>
-                            </li>
-                            <li>
-                                <a href="Copy_ad.aspx"><i class="fa fa-volume-up"></i><span class="sidebar-text">Campaign Ads</span>
-                                    <span class="fa arrow"></span><span class="label label-danger pull-right m-r-20 w-300">New</span></a>
+                <div id="main-menu">
+                    <ul class="sidebar-nav">
+                        <li class="current">
+                            <a href="chart_view_Affiliate.aspx"><i class="fa fa-dashboard"></i><span class="sidebar-text">Dashboard</span></a>
+                        </li>
+                        <li>
+                            <a href="Copy_ad.aspx"><i class="fa fa-volume-up"></i><span class="sidebar-text">Campaign Ads</span>
+                                <span class="fa arrow"></span><span class="label label-danger pull-right m-r-20 w-300">New</span></a>
                                
-                            </li>
+                        </li>
                            
-                            <li>
-                                <a href="Add_new_site_for_affiliate.aspx"><i class="fa fa-television"></i>
-                                    <span class="sidebar-text">Register A Site</span> <span class="fa arrow"></span></a>
-                            </li>
+                        <li>
+                            <a href="Add_new_site_for_affiliate.aspx"><i class="fa fa-television"></i>
+                                <span class="sidebar-text">Register A Site</span> <span class="fa arrow"></span></a>
+                        </li>
+
+                        <li>
+                            <a href="AffiliatePayment.aspx"><i class="fa fa-television"></i>
+                                <span class="sidebar-text">Payment Request</span> <span class="fa arrow"></span></a>
+                        </li>
 
                             <li>
-                                <a href="AffiliatePayment.aspx"><i class="fa fa-television"></i>
-                                    <span class="sidebar-text">Payment Request</span> <span class="fa arrow"></span></a>
-                            </li>
+                            <a href="FrontEnd.aspx"><i class="fa fa-television"></i>
+                                <span class="sidebar-text">Frontend Report</span> <span class="fa arrow"></span></a>
+                        </li>
+                            <li>
+                            <a href="ManagePassback.aspx"><i class="fa fa-television"></i>
+                                <span class="sidebar-text">Manage Passback</span> <span class="fa arrow"></span></a>
+                        </li>
 
-                             <li>
-                                <a href="FrontEnd.aspx"><i class="fa fa-television"></i>
-                                    <span class="sidebar-text">Frontend Report</span> <span class="fa arrow"></span></a>
-                            </li>
-                             <li>
-                                <a href="ManagePassback.aspx"><i class="fa fa-television"></i>
-                                    <span class="sidebar-text">Manage Passback</span> <span class="fa arrow"></span></a>
-                            </li>
-
-                        </ul>
-                   
-                </nav>
+                    </ul>
+                </div>
+            </nav>
             <asp:HiddenField ID="hdnfProfileIndiCator" runat="server" />
             <!-- END MAIN SIDEBAR -->
             <!-- BEGIN MAIN CONTENT -->
             <div id="main-content" class="dashboard">
+                <div id="preloader" class="preloader-container">
+                  <div class="loader">Loading...</div>
+                </div>
                 <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
                 </asp:ContentPlaceHolder>
             </div>
@@ -247,7 +251,6 @@
             <!-- END  PAGE LEVEL SCRIPTS -->
             <script src="assets/js/application.js"></script>
             <meta http-equiv="content-type" content="text/html;charset=UTF-8">--%>
-        <!-- /Added by HTTrack -->
     </div>
     </form>
     <script src="js/bootstrap.min.js"></script>

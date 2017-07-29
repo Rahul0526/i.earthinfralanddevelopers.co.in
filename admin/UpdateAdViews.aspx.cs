@@ -431,8 +431,13 @@ public partial class admin_UpdateAdViews : System.Web.UI.Page
         {
             event_type = "Impression";
         }
-        string sqlQuery = "insert into view_click_maintain_on_daily_base (campain_id,affiliate_id,Website,event_found,even_type,event_date,date,OS_type,CountryName) values('" + campId + "', '" + affiliateId + "', '" + domain + "','Yes', '" + event_type + "', '" + System.DateTime.Now + "','" + System.DateTime.Now + "','" + os + "','" + country + "');";
-        sqlQuery += "UPDATE campain_details SET total_views=total_views+1 WHERE campain_id='" + campId + "'";
+        string sqlQuery = "";
+        string[] campIds = campId.Split(',');
+        for (int count = 0; count < campIds.Length; count++)
+        {
+            sqlQuery += "insert into view_click_maintain_on_daily_base (campain_id,affiliate_id,Website,event_found,even_type,event_date,date,OS_type,CountryName) values('" + campIds[count] + "', '" + affiliateId + "', '" + domain + "','Yes', '" + event_type + "', '" + System.DateTime.Now + "','" + System.DateTime.Now + "','" + os + "','" + country + "');";
+            sqlQuery += "UPDATE campain_details SET total_views=total_views+1 WHERE campain_id='" + campIds[count] + "';";
+        }
         SqlCommand cmd = new SqlCommand(sqlQuery, con);
         cmd.ExecuteNonQuery();
         con.Close();

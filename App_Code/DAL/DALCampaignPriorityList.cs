@@ -18,6 +18,14 @@ public class DALCampaignPriorityList
     }
     public DataSet GetPriorityCampaignList(string pageUrl, string bannerType, string country, string osType, int noOfAds, DataSet keyWordCampaigns, string[] cookieCampaigns, string computerId, string limitConversionsInQuery)
     {
+        string structureQuery = "SELECT TOP(0) [campaign_id],[campaigin_name],[title],[discription],[url],[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url] FROM [dbo].[campaigns]";
+        SqlConnection con = new SqlConnection(strcon);
+        con.Open();
+        SqlDataAdapter adp = new SqlDataAdapter(structureQuery, con);
+        DataTable dsGetData = new System.Data.DataTable();
+        adp.Fill(dsGetData);
+        con.Close();
+
         DataTable dtAvailCookieAds = GetCookiesCampList(cookieCampaigns, bannerType, country, osType, limitConversionsInQuery);
 
         for (int arrCount = cookieCampaigns.Length - 1; arrCount >= 0; arrCount--)
@@ -49,62 +57,35 @@ public class DALCampaignPriorityList
 
             if (keyWordCampaigns != null) // now keyword camapign has only one campaign . so this loop will run for 1 time .
             {
-                for (int RowCounter = 0; RowCounter < keyWordCampaigns.Tables[0].Rows.Count; RowCounter++)
+                foreach(DataRow dr in keyWordCampaigns.Tables[0].Rows)
                 {
-
-                    DataRow drCampId = campaignList.NewRow();
-                    drCampId["campId"] = keyWordCampaigns.Tables[0].Rows[RowCounter]["campaign_id"].ToString();
-                    int IsExists = 0;
-                    foreach (DataRow dr in campaignList.Rows)
-                    {
-                        if (dr["campId"].ToString() == keyWordCampaigns.Tables[0].Rows[RowCounter]["campaign_id"].ToString())
-                        { IsExists++; }
-                        else
-                            continue;
-                    }
-                    if (IsExists == 0)
-                        campaignList.Rows.Add(drCampId);
-                    // dtPriorCampaigns.Tables[0].Rows.Add(KeyWordCampaigns.Tables[0].Rows[RowCounter] as DataRow);
+                    DataRow drCamp = dsGetData.NewRow();
+                    //drCamp = dsGetDataCamp.Rows[0];
+                    drCamp["campaign_id"] = dr[0].ToString();
+                    drCamp["campaigin_name"] = dr[1].ToString();
+                    drCamp["title"] = dr[2].ToString();
+                    drCamp["discription"] = dr[3].ToString();
+                    drCamp["url"] = dr[4].ToString();
+                    drCamp["call_to_action"] = dr[5].ToString();
+                    drCamp["action"] = dr[6].ToString();
+                    drCamp["device_and_action"] = dr[7].ToString();
+                    drCamp["stars"] = dr[8].ToString();
+                    drCamp["cost"] = dr[9].ToString();
+                    drCamp["sponsers_adv"] = dr[10].ToString();
+                    drCamp["country_targeted"] = dr[11].ToString();
+                    drCamp["Add_style_formate"] = dr[12].ToString();
+                    drCamp["date"] = dr[13].ToString();
+                    drCamp["icon_img"] = dr[14].ToString();
+                    drCamp["vedio_url"] = dr[15].ToString();
+                    dsGetData.Rows.Add(drCamp);
                 }
             }
-
-
-
-            if (campaignList.Rows.Count >= noOfAds) // now in the main list , both campaigns are has been added . but see this condition . list count is 2 ,,, and requested load need 4 . so we have to choose 2 more campaigns . 
-            {
-                // return dtPriorCampaigns;
-                DataTable dtReturn = GetCampaignDetails(bannerType, country, osType, campaignList, limitConversionsInQuery);
-                if (dtPriorCampaigns.Tables.Count > 0)
-                    dtPriorCampaigns.Tables.RemoveAt(0);
-
-                dtPriorCampaigns.Tables.Add(dtReturn);
-                return dtPriorCampaigns; // if condition was setisfied ... it  return from here . 
-            }
-            else
-            {
-                int GetMoreIds = noOfAds - campaignList.Rows.Count; // more needed camps 
-                DataTable _RandomCamps = GetRendomCamps(bannerType, country, osType, campaignList, GetMoreIds, limitConversionsInQuery);
-                if (_RandomCamps != null)
-                {
-                    for (int RowCounter = 0; RowCounter < _RandomCamps.Rows.Count; RowCounter++)
-                    {
-
-                        DataRow dr = campaignList.NewRow();
-                        dr["campId"] = _RandomCamps.Rows[RowCounter]["campaign_id"].ToString();
-                        campaignList.Rows.Add(dr);
-                    }
-                }
-                DataTable dtReturn = GetCampaignDetails(bannerType, country, osType, campaignList, limitConversionsInQuery);
-                if (dtPriorCampaigns.Tables.Count > 0)
-                    dtPriorCampaigns.Tables.RemoveAt(0);
-                dtPriorCampaigns.Tables.Add(dtReturn);
-                return dtPriorCampaigns;
-            }
-
-
-
         }
+        if (dtPriorCampaigns.Tables.Count > 0)
+            dtPriorCampaigns.Tables.RemoveAt(0);
 
+        dtPriorCampaigns.Tables.Add(dsGetData);
+        return dtPriorCampaigns;
         //   return null;
     }
 
@@ -114,6 +95,15 @@ public class DALCampaignPriorityList
         {
             string andCondition = string.Empty;
             string _query = string.Empty;
+            string CountryTargettingFilter = string.Empty;
+            if (Country.Trim() != "")
+            {
+                CountryTargettingFilter = "(country_targeted like '%" + Country + "%' OR country_targeted = '')";
+            }
+            else
+            {
+                CountryTargettingFilter = "(country_targeted = '')";
+            }
 
             if (dt.Rows.Count > 0)
             {
@@ -124,10 +114,10 @@ public class DALCampaignPriorityList
                     else
                         andCondition += " and campaign_id!='" + dr["campId"] + "'";
                 }
-                _query = "SELECT top(" + rEMAINnO + ") [campaign_id], [campaigin_name], [title], [discription], [url], [call_to_action], [action], [device_and_action], [stars], [cost], [sponsers_adv], [country_targeted], [Add_style_formate], [date], [icon_img], [vedio_url] FROM [dbo].[campaigns] where Add_style_formate='" + BannerType + "' and country_targeted like '%" + Country + "%' and  " + andCondition + " and device_and_action like '%" + OsType + "%'  and (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery;
+                _query = "SELECT top(" + rEMAINnO + ") [campaign_id], [campaigin_name], [title], [discription], [url], [call_to_action], [action], [device_and_action], [stars], [cost], [sponsers_adv], [country_targeted], [Add_style_formate], [date], [icon_img], [vedio_url] FROM [dbo].[campaigns] where Add_style_formate='" + BannerType + "' and "+ CountryTargettingFilter + " and  " + andCondition + " and device_and_action like '%" + OsType + "%'  and (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery;
             }
             else
-                _query = "SELECT top(" + rEMAINnO + ") [campaign_id], [campaigin_name], [title], [discription], [url], [call_to_action], [action], [device_and_action], [stars], [cost], [sponsers_adv], [country_targeted], [Add_style_formate], [date], [icon_img], [vedio_url] FROM [dbo].[campaigns] where Add_style_formate='" + BannerType + "' and country_targeted like '%" + Country + "%'  and device_and_action like '%" + OsType + "%'  and (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery;
+                _query = "SELECT top(" + rEMAINnO + ") [campaign_id], [campaigin_name], [title], [discription], [url], [call_to_action], [action], [device_and_action], [stars], [cost], [sponsers_adv], [country_targeted], [Add_style_formate], [date], [icon_img], [vedio_url] FROM [dbo].[campaigns] where Add_style_formate='" + BannerType + "' and " + CountryTargettingFilter + " and device_and_action like '%" + OsType + "%'  and (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + LimitConversionsInQuery;
 
             SqlConnection con = new SqlConnection(strcon);
             con.Open();
@@ -212,7 +202,17 @@ public class DALCampaignPriorityList
             }
             else
             {
-                _query = "SELECT  [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url] FROM [dbo].[campaigns] where Add_style_formate='" + bannerType + "' and country_targeted like '%" + country + "%' and device_and_action like '%" + osType + "%' and (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + limitConversionsInQuery;
+
+                string CountryTargettingFilter = string.Empty;
+                if (country.Trim() != "")
+                {
+                    CountryTargettingFilter = "(country_targeted like '%" + country + "%' OR country_targeted = '')";
+                }
+                else
+                {
+                    CountryTargettingFilter = "(country_targeted = '')";
+                }
+                _query = "SELECT  [campaign_id],  [campaigin_name]  ,[title]  ,[discription],[url] ,[call_to_action],[action],[device_and_action],[stars],[cost],[sponsers_adv],[country_targeted],[Add_style_formate],[date],[icon_img],[vedio_url] FROM [dbo].[campaigns] where Add_style_formate='" + bannerType + "' and " + CountryTargettingFilter + " and device_and_action like '%" + osType + "%' and (select status from dbo.campain_details where campain_id=campaigns.campaign_id)='Running' AND " + limitConversionsInQuery;
 
                 SqlConnection con = new SqlConnection(strcon);
                 con.Open();
@@ -293,9 +293,19 @@ public class DALCampaignPriorityList
     {
         try
         {
+
+            string CountryTargettingFilter = string.Empty;
+            if (Country.Trim() != "")
+            {
+                CountryTargettingFilter = "(country_targeted like '%" + Country + "%' OR country_targeted = '')";
+            }
+            else
+            {
+                CountryTargettingFilter = "(country_targeted = '')";
+            }
             SqlConnection con = new SqlConnection(strcon);
             con.Open();
-            string query = "SELECT  [Add_style_formate]  FROM [dbo].[campaigns]  where campaign_id='" + CookieBannerId + "' and country_targeted like '%" + Country + "%' ORDER BY NEWID() ";
+            string query = "SELECT  [Add_style_formate]  FROM [dbo].[campaigns]  where campaign_id='" + CookieBannerId + "' and "+ CountryTargettingFilter + " ORDER BY NEWID() ";
 
             SqlDataAdapter adp = new SqlDataAdapter(query, con);
 

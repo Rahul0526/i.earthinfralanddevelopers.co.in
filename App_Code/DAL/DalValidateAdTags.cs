@@ -19,8 +19,6 @@ public class DalValidateAdTags
     {
         try
         {
-
-
             int RowCount = dtcamp.Rows.Count;
             //string[] Arr={"A","B","C","D","E","F"};
             DataTable dPriority = new DataTable();
@@ -98,11 +96,6 @@ public class DalValidateAdTags
             // int[] Arr = { A, B, C, D, E, F };
 
              return CampaignPosition;
-            
-
-  
-       
-
         }
         catch(Exception sqe)
         {

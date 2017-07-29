@@ -3,10 +3,10 @@
 
 <%--<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>--%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head id="Head1" runat="server">
 	<META HTTP-EQUIV="Access-Control-Allow-Origin" CONTENT="http://i.earthinfralanddevelopers.co.in"/> 
-	<%if (Request.QueryString["View"] != "0") %>
+	<%if (Request.QueryString["View"] != "0" && Request.QueryString["camp_id"] != "") %>
 	<% { %>
 	<title></title>
 	<meta name="viewport" content="width=device-width, initial-scale=1"/> 
@@ -402,7 +402,7 @@
 	<%} %>
 </head>
 <body>
-	<%if (Request.QueryString["View"] != "0") %>
+	<%if (Request.QueryString["View"] != "0" && Request.QueryString["camp_id"] != "") %>
 	<% { %>
 	<form id="form1" runat="server">
 	<asp:HiddenField ID="sid" runat="server" />
@@ -475,19 +475,20 @@
 						height: 55px;
 					}
 					
-					.owl-item .card-banner:before
+					/*.owl-item .card-banner:before
 					{
 						content: "";
 						display: inline-block;
 						float: left;
 						width: 100%;
 						padding-top: 100%;
-					}
+					}*/
 					.owl-item .card-banner
 					{
 						position: relative;
 						float: left;
 						width: 100%;
+                        height: 94px;
 					}
 					.owl-item #button_anchor_tag
 					{
@@ -615,7 +616,7 @@
 						<div class="col-xs-2 install-btn-new pull-right" id="action_button_banner2" style="margin-top: 20px;
 							position: relative;" runat="server" onclick="__doPostBack('install_link_banner2', '');">
 							<span id="Span1" runat="server" style="text-decoration: none; text-transform: lowercase;
-								font-size: 15px; line-height: 30px;">Go</span>
+								font-size: 15px; line-height: 30px;"></span>
 							<asp:LinkButton ID="install_link_banner2" runat="server" OnClick="Banner_Click"></asp:LinkButton>
 						</div>
 					</a>
@@ -646,21 +647,16 @@
 				</a>
 				<!--add-banner-->
 				<a href="#" runat="server" id="A2" style="text-decoration: none;" target="_parent" class="callClick">
-					<div class="title2-p L-R " runat="server" id="title_banner3">
-						Show Me What A True Hero Looks Like
-					</div>
+					<div class="title2-p L-R " runat="server" id="title_banner3"></div>
 				</a><a href="#" runat="server" id="A1" style="text-decoration: none;" target="_blank" class="callClick">
-					<div class="card-description L-R" runat="server" id="discription_banner3" style="display: none;">
-						Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem
-						Ipsum is simply dummy text of the printing and typesetting industry.
-					</div>
+					<div class="card-description L-R" runat="server" id="discription_banner3" style="display: none;"></div>
 				</a>
 				<!--card-description-->
 				<a href="#" runat="server" id="LinkButtonAnchorTag_Banner3" target='_parent' class="callClick">
 					<div class="install-btn-new" id="action_button_banner3" style="margin: 10px 5px;
 						position: relative;" runat="server" onclick="__doPostBack('install_link_banner2', '');">
 						<span id="Span3" runat="server" style="text-decoration: none; text-transform: lowercase;
-							font-size: 15px; line-height: 30px;">Go</span>
+							font-size: 15px; line-height: 30px;"></span>
 						<asp:LinkButton ID="install_link_banner3" runat="server" OnClick="Banner_Click"></asp:LinkButton>
 					</div>
 				</a>
@@ -791,12 +787,8 @@
 					</div>
 					<!--card-icon-->
 					<div class="col-xs-10">
-						<div class="title " runat="server" id="title_banner_5">
-							Show Me What A True Hero
-						</div>
-						<div class="card-description" runat="server" id="discription_banner_5">
-							Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-						</div>
+						<div class="title " runat="server" id="title_banner_5"></div>
+						<div class="card-description" runat="server" id="discription_banner_5"></div>
 						<!--card-description-->
 					</div>
 					<div class=" clearfix">
@@ -1120,9 +1112,17 @@
 				}
 			}
 		}
-		$(document).ready(function () {
+        $(document).ready(function () {
+            var descHeight = 0;
+            if ($('#owl-demo').length) {
+                $('.card-description').each(function () {
+                    if ($(this).innerHeight() > descHeight) descHeight = $(this).innerHeight();
+                });
+                $('.card-description').innerHeight(descHeight);
+            }
+
 			function inIframe() {
-				if (top != self) {
+                if (top != self) {
 					var contentHeight = $('html').height(); //Just this part I did with jQuery as I was sure that the document uses it
 					postSize(contentHeight);
 				}
